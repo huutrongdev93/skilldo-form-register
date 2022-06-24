@@ -5,11 +5,11 @@ Plugin class    : generate_form_register
 Plugin uri      : http://sikido.vn
 Description     : Trình xây dựng form đăng ký
 Author          : Nguyễn Hữu Trọng
-Version         : 3.0.0
+Version         : 3.1.0
 */
 class generate_form_register {
 
-    private $name = 'generate_form_register';
+    private string $name = 'generate_form_register';
 
     function __construct() {
         add_action('admin_init', array($this, 'add_admin_menu'));
@@ -22,13 +22,9 @@ class generate_form_register {
     }
 
     public function uninstall() {
-        $this->drop_database();
-    }
-
-    public function drop_database() {
-        $model = get_model('plugins', 'backend');
-        if($model->db_table_exists('generate_form_register')) {
-            $model->query("DROP TABLE IF EXISTS `".CLE_PREFIX."generate_form_register`");
+        $model = model();
+        if($model::schema()->hasTable('generate_form_register')) {
+            $model::schema()->drop('generate_form_register');
         }
     }
 
@@ -50,7 +46,6 @@ class generate_form_register {
                 if(!empty($form->taxonomy_config)) {
                     $code = Form_Register::generateCodeTaxonomy($form);
                     $code = trim($code);
-                    // echo($code);
                     eval($code);
                 }
             }

@@ -2,7 +2,7 @@
 <div class="wheel-box">
     <?php foreach ($forms as $key => $form) { $form = (object)$form; ?>
         <form class="box item-form" data-form-id="<?php echo $form->key?>">
-            <div class="header" style="padding:0px 10px;margin-bottom:10px;"> <h2><?php echo $form->name?></h2> </div>
+            <div class="header" style="padding:0 10px;margin-bottom:10px;"> <h2><?php echo $form->name?></h2> </div>
             <div class="box-content">
                 <div class="col-md-12">
                     <div class="row wheel-count">

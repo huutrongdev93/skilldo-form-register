@@ -8,27 +8,25 @@ Class Form_Register_Active {
     }
 
     public static function createDatabase() {
-        $model = get_model('plugins', 'backend');
-        if(!$model->db_table_exists('generate_form_register')) {
-            $model->query("CREATE TABLE `".CLE_PREFIX."generate_form_register` (
-                `id` int(11) NOT NULL,
-                `is_live` tinyint(4) NOT NULL DEFAULT '1',
-                `send_email` tinyint(4) NOT NULL DEFAULT '0',
-                `is_redirect` tinyint(4) NOT NULL DEFAULT '0',
-                `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-                `key` varchar(255) NOT NULL,
-                `field` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-                `taxonomy` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-                `taxonomy_icon` varchar(255) NOT NULL,
-                `url_redirect` varchar(255) NOT NULL,
-                `taxonomy_config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-                `email_template` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-                `order` int(11) NOT NULL DEFAULT '0',
-                `created` datetime DEFAULT NULL,
-                `updated` datetime DEFAULT NULL
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-            $model->query("ALTER TABLE `".CLE_PREFIX."generate_form_register` ADD PRIMARY KEY (`id`);");
-            $model->query("ALTER TABLE `".CLE_PREFIX."generate_form_register` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;");
+        $model = model();
+        if(!$model::schema()->hasTable('generate_form_register')) {
+            $model::schema()->create('generate_form_register', function ($table) {
+                $table->increments('id');
+                $table->tinyInteger('is_live')->default(1);
+                $table->tinyInteger('send_email')->default(0);
+                $table->tinyInteger('is_redirect')->default(0);
+                $table->string('name', 200)->collate('utf8mb4_unicode_ci')->nullable();
+                $table->string('key', 100);
+                $table->text('field')->collate('utf8mb4_unicode_ci')->nullable();
+                $table->text('taxonomy')->collate('utf8mb4_unicode_ci')->nullable();
+                $table->string('taxonomy_icon', 255);
+                $table->string('url_redirect', 255);
+                $table->text('taxonomy_config')->collate('utf8mb4_unicode_ci')->nullable();
+                $table->text('email_template')->collate('utf8mb4_unicode_ci')->nullable();
+                $table->dateTime('created');
+                $table->dateTime('updated')->nullable();
+                $table->integer('order')->default(0);
+            });
         }
     }
 
@@ -47,7 +45,7 @@ Class Form_Register_Active {
         ];
 
         foreach ($forms_default as $key => $form) {
-            if(Form_Register::count(['where' => ['key' => $form['key']]]) == 0) {
+            if(Form_Register::count(Qr::set('key', $form['key'])) == 0) {
                 Form_Register::insert($form);
             }
         }

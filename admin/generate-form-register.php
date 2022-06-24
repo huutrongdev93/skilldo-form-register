@@ -52,13 +52,10 @@ function generate_form_register() {
 }
 
 function generate_form_register_footer() {
-
     if(Template::isPage('post_index')) {
-
         $post_type = Admin::getPostType();
-
-        if(!empty($post_type) && $post_type != 'post' && Form_Register::count(['where' => array('taxonomy' => $post_type)]) != 0) {
-            get_model()->settable('post')->update_where(['status' => 0], ['post_type' => $post_type, 'status' => 1]);
+        if(!empty($post_type) && $post_type != 'post' && Form_Register::count(Qr::set('taxonomy',$post_type)) != 0) {
+            model('post')->update(['status' => 0], Qr::set('post_type', $post_type)->where('status', 1));
             CacheHandler::save('generate_form_count_'.$post_type, 0);
         }
     }

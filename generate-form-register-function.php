@@ -1,47 +1,38 @@
 <?php
 Class Form_Register {
-    public static function get($args = []) {
-        if(is_numeric($args)) $args = array('where' => array('id' => (int)$args));
-        if(!have_posts($args)) $args = [];
-        $args = array_merge(array('where' => [], 'params' => []), $args );
-        $model 	= get_model('home');
-        $model->settable('generate_form_register');
-        $model->settable_metabox('metabox');
-        $generate_form_register = $model->get_data($args, 'generate_form_register');
-        return apply_filters('get_generate_form_register', $generate_form_register);
+    static string $table = 'generate_form_register';
+    static public function handleParams($args) {
+        $query = ($args instanceof Qr) ? clone $args : Qr::set();
+        if(is_array($args)) {
+            $query = Qr::convert($args,);
+            if(!$query) return $query;
+        }
+        if(is_numeric($args)) $query = Qr::set(self::$table.'.id', $args);
+        return $query;
     }
-    public static function getBy($field, $value, $params = []) {
-        $field = removeHtmlTags($field);
-        $value = removeHtmlTags($value);
-        $args  = ['where' => array($field => $value)];
-        if( have_posts($params) ) $arg['params'] = $params;
-        return apply_filters('get_generate_form_register_by', static::get($args), $field, $value );
+    public static function get($args = []) {
+        $args = self::handleParams($args);
+        if(!$args instanceof Qr) return new Illuminate\Support\Collection();
+        return apply_filters('get_generate_form_register', model(self::$table)->get($args), $args);
+    }
+    public static function getBy($field, $value) {
+        return apply_filters('get_generate_form_register_by', static::get(Qr::set($field, $value)), $field, $value );
     }
     public static function gets($args = []) {
-        if( !have_posts($args) ) $args = [];
-        $args = array_merge( array('where' => [], 'params' => [] ), $args );
-        $model 	= get_model('home')->settable('generate_form_register')->settable_metabox('metabox');
-        $generate_form_register = $model->gets_data($args, 'generate_form_register');
-        return apply_filters( 'gets_generate_form_register', $generate_form_register, $args );
+        $args = self::handleParams($args);
+        if(!$args instanceof Qr) return new Illuminate\Support\Collection();
+        return apply_filters('gets_generate_form_register', model(self::$table)->gets($args), $args);
     }
     public static function getsBy($field, $value, $params = []) {
-        $field = removeHtmlTags( $field );
-        $value = removeHtmlTags( $value );
-        $args = array( 'where' => array( $field => $value ) );
-        if( have_posts($params) ) $arg['params'] = $params;
-        return apply_filters( 'gets_generate_form_register_by', static::gets($args), $field, $value );
+        return apply_filters('gets_generate_form_register_by', static::gets(Qr::set($field, $value)), $field, $value );
     }
     public static function count($args = []) {
-        if( is_numeric($args) ) $args = array( 'where' => array('id' => (int)$args ) );
-        if( !have_posts($args) ) $args = [];
-        $args = array_merge( array('where' => [], 'params' => [] ), $args );
-        $model 	= get_model('home')->settable('generate_form_register')->settable_metabox('metabox');
-        $generate_form_register = $model->count_data($args, 'generate_form_register');
-        return apply_filters( 'count_generate_form_register', $generate_form_register, $args );
+        $args = self::handleParams($args);
+        if(!$args instanceof Qr) return new Illuminate\Support\Collection();
+        return apply_filters('count_generate_form_register', model(self::$table)->count($args), $args);
     }
     public static function insert($generate_form_register = []) {
-        $model 	= get_model('home')->settable('generate_form_register');
-        if (!empty( $generate_form_register['id'])) {
+        if (!empty($generate_form_register['id'])) {
             $id             = (int) $generate_form_register['id'];
             $update         = true;
             $old_generate_form_register = static::get($id);
@@ -75,26 +66,23 @@ Class Form_Register {
         $send_email         = (isset($generate_form_register['send_email'])) ?  (int)$generate_form_register['send_email'] : 0;
         $data = compact( 'name', 'key','field','taxonomy', 'taxonomy_icon','taxonomy_config','is_live', 'send_email', 'email_template', 'is_redirect', 'url_redirect' );
         $data = apply_filters( 'pre_insert_generate_form_register_data', $data, $generate_form_register, $update ? (int) $id : null );
+        $model 	= model(self::$table);
         if ($update) {
-            $model->settable('generate_form_register');
-            $model->update_where( $data, compact( 'id' ) );
+            $model->update($data, Qr::set($id));
             $generate_form_register_id = (int) $id;
         } else {
-            $model->settable('generate_form_register');
-            $generate_form_register_id = $model->add( $data );
+            $generate_form_register_id = $model->add($data);
         }
-        $model->settable('generate_form_register');
-        $generate_form_register_id  = apply_filters( 'after_insert_generate_form_register', $generate_form_register_id, $generate_form_register, $data, $update ? (int) $id : null  );
-        return $generate_form_register_id;
+        return apply_filters( 'after_insert_generate_form_register', $generate_form_register_id, $generate_form_register, $data, $update ? (int) $id : null  );
     }
     public static function delete($generate_form_registerID = 0) {
-        $generate_form_registerID = (int)removeHtmlTags($generate_form_registerID);
+        $generate_form_registerID = (int)$generate_form_registerID;
         if( $generate_form_registerID == 0 ) return false;
-        $count  = static::count( $generate_form_registerID );
-        if( $count == 1 ) {
-            $model 	= get_model('home')->settable('generate_form_register');
+        $count = static::count( $generate_form_registerID );
+        if($count == 1) {
+            $model 	= model(self::$table);
             do_action('delete_generate_form_register', $generate_form_registerID );
-            if($model->delete_where(['id'=> $generate_form_registerID])) {
+            if($model->delete(Qr::set($generate_form_registerID))) {
                 do_action('delete_generate_form_register_success', $generate_form_registerID );
                 return [$generate_form_registerID];
             }
@@ -102,17 +90,11 @@ Class Form_Register {
         return false;
     }
     public static function taxonomyConfig($taxonomyConfig = '') {
-
         if(empty($taxonomyConfig)) return [];
-
         $taxonomyConfig = explode("\n", $taxonomyConfig);
-
-        foreach ($taxonomyConfig as $key => $value) eval('$'.$value.';');
-
+        foreach ($taxonomyConfig as $value) eval('$'.$value.';');
         if(!isset($name)) $name = '';
-
         if(!isset($icon)) $icon = '';
-
         return compact('name','icon');
     }
     public static function config($field = '', $type = '') {
@@ -163,7 +145,8 @@ Class Form_Register {
         $count =  CacheHandler::get($cache_id);
 
         if(!is_numeric($count)) {
-            $count = Posts::count(['post_type' => $taxonomy_key, 'where' => ['status' => 1]]); CacheHandler::save($cache_id, $count);
+            $count = Posts::count(Qr::set('post_type', $taxonomy_key)->where('status', 1));
+            CacheHandler::save($cache_id, $count);
         }
 
         ob_start();?>

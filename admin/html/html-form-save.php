@@ -41,7 +41,7 @@
 
                         <div class="row" style="margin-bottom:10px;">
                             <div class="col-md-3">
-                                <label for="">Bật/Tăt form</label>
+                                <label for="">Bật/Tắt form</label>
                                 <p style="font-size:13px;color:#999;">Cho phép khách hàng đăng ký sử dụng form</p>
                             </div>
                             <div class="col-md-9">
@@ -52,7 +52,7 @@
                         <div class="row" style="margin-bottom:10px;">
                             <div class="col-md-3">
                                 <label for="">Gửi email</label>
-                                <p style="font-size:13px;color:#999;">Bạn cần cấu hình email template để gửi được email theo ý muốn</p>
+                                <p style="font-size:13px; color:#999;">Bạn cần cấu hình email template để gửi được email theo ý muốn</p>
                             </div>
                             <div class="col-md-9">
                                 <input type="checkbox" name="send_email" id="send_email" class="icheck " value="1" <?php echo (isset($form) && $form->send_email == 1) ? 'checked' : '';?>>
@@ -62,7 +62,7 @@
                         <div class="row" style="margin-bottom:10px;">
                             <div class="col-md-3">
                                 <label for="">Chuyển hướng sau khi submit</label>
-                                <p style="font-size:13px;color:#999;">Sau khi đăng ký thành công trang sẽ được chuyển hướng đi</p>
+                                <p style="font-size:13px; color:#999;">Sau khi đăng ký thành công trang sẽ được chuyển hướng đi</p>
                             </div>
                             <div class="col-md-9">
                                 <input type="checkbox" name="is_redirect" id="is_redirect" class="icheck " value="1" <?php echo (isset($form) && $form->is_redirect == 1) ? 'checked' : '';?>>
@@ -153,6 +153,14 @@
 			$('#ajax_item_save_loader').show();
 			let data 		= $(this).serializeJSON();
 			data.action     =  'Form_Register_Ajax::save';
+            $(this).find('textarea').each(function(index, el) {
+                let textareaid 	= $(this).attr('id');
+                let value 		= $(this).val();
+                if($(this).hasClass('tinymce') === true || $(this).hasClass('tinymce-shortcut') === true){
+                    value 	= document.getElementById(textareaid+'_ifr').contentWindow.document.body.innerHTML;
+                }
+                data[$(this).attr('name')] = value;
+            });
 			$jqxhr   = $.post(base+'/ajax', data, function() {}, 'json');
 			$jqxhr.done(function( data ) {
 				$('#ajax_item_save_loader').hide();
