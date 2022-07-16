@@ -1,9 +1,9 @@
 <?php
 function generate_form_register() {
 
-    $action = InputBuilder::Get('action');
+    $action = Request::Get('action');
 
-    $tab = InputBuilder::Get('tab');
+    $tab = Request::Get('tab');
 
     if(empty($tab)) {
 
@@ -11,7 +11,7 @@ function generate_form_register() {
             $FormBuilder = new FormBuilder();
         }
         else if($action == 'edit_form') {
-            $form_id = InputBuilder::get('form_id');
+            $form_id = Request::get('form_id');
             $form = Form_Register::get($form_id);
             $FormBuilder = new FormBuilder();
         }

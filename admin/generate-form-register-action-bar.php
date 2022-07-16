@@ -12,7 +12,7 @@ function action_bar_generate_form_register_button($module) {
 
 function action_bar_generate_form_register_button_right($module) {
 
-    $action = InputBuilder::Get('action');
+    $action = Request::Get('action');
 
     if(empty($action)) {
         ?>

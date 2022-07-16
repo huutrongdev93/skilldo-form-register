@@ -1,36 +1,6 @@
 <?php
-Class Form_Register {
+Class Form_Register extends Model{
     static string $table = 'generate_form_register';
-    static public function handleParams($args) {
-        $query = ($args instanceof Qr) ? clone $args : Qr::set();
-        if(is_array($args)) {
-            $query = Qr::convert($args,);
-            if(!$query) return $query;
-        }
-        if(is_numeric($args)) $query = Qr::set(self::$table.'.id', $args);
-        return $query;
-    }
-    public static function get($args = []) {
-        $args = self::handleParams($args);
-        if(!$args instanceof Qr) return new Illuminate\Support\Collection();
-        return apply_filters('get_generate_form_register', model(self::$table)->get($args), $args);
-    }
-    public static function getBy($field, $value) {
-        return apply_filters('get_generate_form_register_by', static::get(Qr::set($field, $value)), $field, $value );
-    }
-    public static function gets($args = []) {
-        $args = self::handleParams($args);
-        if(!$args instanceof Qr) return new Illuminate\Support\Collection();
-        return apply_filters('gets_generate_form_register', model(self::$table)->gets($args), $args);
-    }
-    public static function getsBy($field, $value, $params = []) {
-        return apply_filters('gets_generate_form_register_by', static::gets(Qr::set($field, $value)), $field, $value );
-    }
-    public static function count($args = []) {
-        $args = self::handleParams($args);
-        if(!$args instanceof Qr) return new Illuminate\Support\Collection();
-        return apply_filters('count_generate_form_register', model(self::$table)->count($args), $args);
-    }
     public static function insert($generate_form_register = []) {
         if (!empty($generate_form_register['id'])) {
             $id             = (int) $generate_form_register['id'];

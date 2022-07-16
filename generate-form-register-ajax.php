@@ -3,15 +3,15 @@ Class Form_Register_Ajax {
     static public function add($ci, $model) {
         $result['status'] = 'error';
         $result['message'] = 'Lưu dữ liệu không thành công.';
-        if(InputBuilder::Post()) {
+        if(Request::Post()) {
 
-            $data = InputBuilder::Post();
+            $data = Request::Post();
 
             unset($data['action']);
             unset($data['post_type']);
             unset($data['cate_type']);
 
-            $key = InputBuilder::Post('key');
+            $key = Request::Post('key');
 
             if(empty($key)) {
                 $result['message'] = 'Key form không được để trống';
@@ -19,7 +19,7 @@ Class Form_Register_Ajax {
                 return false;
             }
 
-            if(Form_Register::count(['where' => ['key' => $key]]) != 0) {
+            if(Form_Register::count(Qr::set('key', $key)) != 0) {
                 $result['message'] = 'Key form đã tồn tại';
                 echo json_encode($result);
                 return false;
@@ -42,9 +42,9 @@ Class Form_Register_Ajax {
 
         $result['message'] = 'Lưu dữ liệu không thành công.';
 
-        if(InputBuilder::Post()) {
+        if(Request::Post()) {
 
-            $data = InputBuilder::Post();
+            $data = Request::Post();
 
             unset($data['action']);
             unset($data['post_type']);
@@ -97,13 +97,13 @@ function ajax_email_register($ci, $model) {
 
 	$result['message'] 	= 'Đăng ký không thành công!';
 
-	if(InputBuilder::Post()) {
+	if(Request::Post()) {
 
-		$form_key = InputBuilder::post('form_key');
+		$form_key = Request::post('form_key');
 
 		$form 	  = Form_Register::getBy('key', $form_key);
 
-		$post 	  = InputBuilder::post();
+		$post 	  = Request::post();
 
 		unset($post['action']);
 
