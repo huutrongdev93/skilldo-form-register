@@ -1,10 +1,10 @@
 <div class="clearfix"></div>
 <div class="wheel-box">
     <?php foreach ($forms as $key => $form) { $form = (object)$form; ?>
-        <form class="box item-form" data-form-id="<?php echo $form->key?>">
+        <div class="box item-form js_item_form_sample" data-form-id="<?php echo $form->key?>">
             <div class="header" style="padding:0 10px;margin-bottom:10px;"> <h2><?php echo $form->name?></h2> </div>
             <div class="box-content">
-                <div class="col-md-12">
+                <div class="m-2">
                     <div class="row wheel-count">
                         <div class="col-md-2">
                             <div class="form-group">
@@ -26,7 +26,7 @@
                                 <input type="text" class="form-control" name="taxonomy_config" value="<?php echo $form->taxonomy_config?>">
                             </div>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="">List Field</label>
                                 <textarea name="field" class="form-control" rows="5"><?php echo $form->field?></textarea>
@@ -36,13 +36,13 @@
                             <label for="">Input name</label>
                             <?php echo $form->sample;?>
                         </div>
-                        <div class="col-md-1">
-                            <button class="btn btn-green btn-block js_form_btn_add"><i class="fad fa-plus"></i> Tạo</button>
+                        <div class="col-md-2">
+                            <button class="btn btn-green btn-block js_form_btn_add"><i class="fad fa-plus"></i> Tạo Form</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     <?php } ?>
 </div>
 
@@ -58,21 +58,31 @@
         border-radius: 5px;
         padding: 10px;
     }
+    .action-bar button[form="system_form"] {
+        display:none;
+    }
 </style>
 <script defer>
     $(function(){
-        $('.item-form').submit(function() {
+        $('.action-bar .pull-left a').attr('href', base + 'system/generate_form_register');
+        $('.js_form_btn_add').click(function() {
 
-            let data = $(this).serializeJSON();
+            let box = $(this).closest('.js_item_form_sample');
 
-            data.action     =  'Form_Register_Ajax::add';
+            let data = $( ':input', box ).serializeJSON();
 
-            $jqxhr   = $.post(ajax, data, function() {}, 'json');
+            data.system_tab_key = $('input[name="system_tab_key"]').val();
 
-            $jqxhr.done(function( data ) {
+            data.action     =  'ajax_system_save';
+
+            let load = $(this).find('.loading');
+
+            load.show();
+
+            $.post(ajax, data, function() {}, 'json').done(function(data) {
+                load.hide();
                 show_message(data.message, data.status);
             });
-
             return false;
         });
     })

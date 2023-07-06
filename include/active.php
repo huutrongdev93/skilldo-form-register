@@ -23,8 +23,6 @@ Class Form_Register_Active {
                 $table->string('url_redirect', 255);
                 $table->text('taxonomy_config')->collate('utf8mb4_unicode_ci')->nullable();
                 $table->text('email_template')->collate('utf8mb4_unicode_ci')->nullable();
-                $table->dateTime('created');
-                $table->dateTime('updated')->nullable();
                 $table->integer('order')->default(0);
             });
         }

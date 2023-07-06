@@ -120,7 +120,8 @@ Class Form_Register extends Model{
         }
 
         ob_start();?>
-        AdminMenu::add('<?php echo $taxonomy_key;?>','<?php echo $config['name'];?>','post?post_type=<?php echo $taxonomy_key;?>',['icon' => '<?php echo $config['icon'];?>', 'position' => 'post', 'count' => '<?php echo $count;?>']);
+        add_filter('admin_post_<?php echo $taxonomy_key;?>_controllers_index_select', function ($select) { return ['id', 'image', 'title', 'slug', 'excerpt', 'content', 'post_type', 'public', 'status', 'order', 'created', 'seo_title', 'seo_description', 'seo_keywords'];});
+        AdminMenu::addSub('marketing','<?php echo $taxonomy_key;?>','<?php echo $config['name'];?>', 'post?post_type=<?php echo $taxonomy_key;?>', ['count' => <?php echo $count;?>]);
         Taxonomy::addPost('<?php echo $taxonomy_key;?>',
             array(
                 'labels' => array(
