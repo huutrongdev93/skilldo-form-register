@@ -5,8 +5,8 @@ Plugin class    : generate_form_register
 Plugin uri      : http://sikido.vn
 Description     : Trình xây dựng form đăng ký
 Author          : Nguyễn Hữu Trọng
-Version         : 3.2.1
-*/
+Version         : 3.2.2
+ */
 class generate_form_register {
 
     private string $name = 'generate_form_register';
@@ -45,29 +45,29 @@ class generate_form_register {
 
     public function load_script() {
         ?>
-        <script>
-            $(function(){
-                $('.email-register-form').submit(function(){
-                    let button = $(this).find('button[type=submit]');
-                    let btnTxt = button.html();
-                    button.html('<i class="fas fa-spinner fa-pulse"></i>');
-                    let form = $(this);
-                    let data = $(this).serializeJSON();
-                    data.action = 'ajax_email_register';
-                    $.post(base+'/ajax', data, function(data) {}, 'json').done(function(response) {
-                        show_message(response.message, response.status);
-                        button.html(btnTxt);
-                        if( response.status === 'success' ) {
-                            form.trigger("reset");
-                            if(response.is_redirect === true) {
-                                window.location.href = response.url_redirect;
-                            }
-                        }
-                    });
-                    return false;
-                });
-            });
-        </script>
+		<script>
+			$(function(){
+				$(document).on('submit', '.email-register-form', function(){
+					let button = $(this).find('button[type=submit]');
+					let btnTxt = button.html();
+					button.html('<i class="fas fa-spinner fa-pulse"></i>');
+					let form = $(this);
+					let data = $(this).serializeJSON();
+					data.action = 'ajax_email_register';
+					$.post(base+'/ajax', data, function(data) {}, 'json').done(function(response) {
+						show_message(response.message, response.status);
+						button.html(btnTxt);
+						if( response.status === 'success' ) {
+							form.trigger("reset");
+							if(response.is_redirect === true) {
+								window.location.href = response.url_redirect;
+							}
+						}
+					});
+					return false;
+				})
+			});
+		</script>
         <?php
     }
 }
