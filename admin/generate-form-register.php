@@ -3,171 +3,370 @@ class GenerateFormRegisterAdmin {
     static function register($tabs) {
         if(Auth::hasCap('generate_form_register')) {
             $tabs['generate_form_register'] = [
-                'label' => 'Form đăng ký',
-                'description' => 'Quản lý form đăng ký, booking',
-                'callback' => 'GenerateFormRegisterAdmin::render',
-                'icon' => '<i class="fad fa-mailbox"></i>',
+				'group'         => 'marketing',
+                'label'         => 'Form đăng ký',
+                'description'   => 'Quản lý form đăng ký, booking',
+                'callback'      => 'GenerateFormRegisterAdmin::render',
+                'icon'          => '<i class="fad fa-mailbox"></i>',
+	            'form' => false
             ];
         }
         return $tabs;
     }
-    static function render(): void {
+    static function render(\SkillDo\Http\Request $request): void {
 
-        $view = Request::get('view');
+        $view = $request->input('view');
 
         if(empty($view)) $view = 'list';
 
-        Plugin::partial('generate-form-register', 'admin/html/form-tabs', ['view' => $view]);
+        Plugin::view('generate-form-register', 'views/admin/form-tabs', ['view' => $view]);
 
         $data = [];
 
         if($view == 'list') {
-            $path = 'form-list';
             $data['forms'] = Form_Register::gets();
+            Plugin::view('generate-form-register', 'views/admin/form-list', $data);
         }
 
-        if($view == 'add') {
-            $path = 'form-save';
-            $data['FormBuilder'] = new FormBuilder();
-        }
-
-        if($view == 'edit') {
-            $path = 'form-save';
-            $data['FormBuilder'] = new FormBuilder();
-            $data['formID'] = (int)Request::get('id');
-            $data['form'] = Form_Register::get($data['formID']);
+        if($view == 'add' || $view == 'edit') {
+            GenerateFormRegisterAdmin::pageSave($request);
         }
 
         if($view == 'sample') {
-            $path = 'form-sample';
-            $data['forms'] = [
-                [
+            $dataFormSample = [
+                (object)[
                     'key'               => 'email_register',
-                    'name'              => 'ĐĂNG KÝ NHẬN TIN',
-                    'is_live'           => 1, 'send_email' => 0,
-                    'field'             => 'email|title|Email|data|true|required,email',
-                    'taxonomy'          => 'email_register', 'taxonomy_config' => "name='Đăng ký nhận tin'",
+                    'name'              => 'Đăng ký nhận tin',
+                    'is_live'           => 1,
+	                'send_email'        => 0,
+                    'field'             => [
+						'default' => [
+                            'name' => [
+                                'use'       => 0,
+                                'field'     => 'name',
+                                'label'     => '',
+                                'required'  => 1,
+                                'limit'     => 0,
+                            ],
+                            'email' => [
+                                'use'       => 1,
+                                'field'     => 'email',
+                                'label'     => 'Email',
+                                'required'  => 1,
+                                'isEmail'   => 0,
+                            ],
+                            'phone' => [
+                                'use'       => 0,
+                                'field'     => 'phone',
+                                'label'     => 'Số điện thoại',
+                                'required'  => 1,
+                                'isPhone'   => 0,
+                            ],
+                            'message' => [
+                                'use'       => 0,
+                                'field'     => 'note',
+                                'label'     => 'Ghi chú',
+                                'required'  => 1,
+                            ]
+                        ],
+                        'metadata' => [],
+                    ],
                     'sample'            => '<p>email</p>'
                 ],
-                [
+                (object)[
                     'key'               => 'register_contact',
-                    'name'              => 'ĐĂNG KÝ TƯ VẤN',
-                    'is_live'           => 1, 'send_email'  => 0,
-                    'field'             => "name|title|Họ và Tên|data|true|required\nemail|excerpt|Email|data|true|required,email\nphone|content|Số điện thoại|data|true|required\nnote|seo_title|Ghi chú|data|true",
-                    'taxonomy'          => 'register_contact', 'taxonomy_config' => "name='Đăng ký tư vấn'",
-                    'sample'            => ' <p>name</p> <p>email</p> <p>phone</p> <p>note</p>'
+                    'name'              => 'Đăng ký tư vấn',
+                    'is_live'           => 1,
+	                'send_email'  => 0,
+                    'field'             => [
+                        'default' => [
+                            'name' => [
+                                'use'       => 1,
+                                'field'     => 'name',
+                                'label'     => 'Họ và tên',
+                                'required'  => 1,
+                                'limit'     => 0,
+                            ],
+                            'email' => [
+                                'use'       => 1,
+                                'field'     => 'email',
+                                'label'     => 'Email',
+                                'required'  => 1,
+                                'isEmail'   => 0,
+                            ],
+                            'phone' => [
+                                'use'       => 1,
+                                'field'     => 'phone',
+                                'label'     => 'Số điện thoại',
+                                'required'  => 1,
+                                'isPhone'   => 0,
+                            ],
+                            'message' => [
+                                'use'       => 1,
+                                'field'     => 'note',
+                                'label'     => 'Ghi chú',
+                                'required'  => 1,
+                            ]
+                        ],
+                        'metadata' => [],
+                    ],
+                    'sample'            => '<p>name</p> <p>email</p> <p>phone</p> <p>note</p>'
                 ],
-                [
+                (object)[
                     'key'               => 'register_booking',
                     'name'              => 'BOOKING',
-                    'is_live'           => 1, 'send_email'  => 0,
-                    'field'             => "name|title|Họ và tên|data|true|required\nemail|excerpt|Email|data|true|required,email\nphone|content|Số điện thoại|data|true|required\ntime|content|Giờ|data|true|required\ndate|seo_title|Ngày|data|true|required",
-                    'taxonomy'          => 'register_booking', 'taxonomy_config' => "name='Booking'",
+                    'is_live'           => 1,
+	                'send_email'        => 0,
+                    'field'             => [
+                        'default' => [
+                            'name' => [
+                                'use'       => 1,
+                                'field'     => 'name',
+                                'label'     => 'Họ và tên',
+                                'required'  => 1,
+                                'limit'     => 0,
+                            ],
+                            'email' => [
+                                'use'       => 1,
+                                'field'     => 'email',
+                                'label'     => 'Email',
+                                'required'  => 1,
+                                'isEmail'   => 0,
+                            ],
+                            'phone' => [
+                                'use'       => 1,
+                                'field'     => 'phone',
+                                'label'     => 'Số điện thoại',
+                                'required'  => 1,
+                                'isPhone'   => 0,
+                            ],
+                            'message' => [
+                                'use'       => 0,
+                                'field'     => 'note',
+                                'label'     => 'Ghi chú',
+                                'required'  => 1,
+                            ]
+                        ],
+                        'metadata' => [
+                            uniqid() => [
+                                'use'       => 1,
+                                'name'     => 'time',
+                                'field'     => 'time',
+                                'label'     => 'Giờ',
+                                'required'  => 1,
+                            ],
+                            uniqid() => [
+                                'use'       => 1,
+                                'name'     => 'data',
+                                'field'     => 'data',
+                                'label'     => 'Ngày',
+                                'required'  => 1,
+                            ],
+                        ],
+                    ],
                     'sample'            => ' <p>name</p> <p>email</p> <p>phone</p> <p>time</p> <p>date</p>'
                 ],
             ];
-        }
 
-        if(!empty($path)) {
-            Plugin::partial('generate-form-register', 'admin/html/'.$path, $data);
+			$forms = [];
+
+			foreach ($dataFormSample as $key => $form) {
+
+                [$formDefault, $formMeta] = static::form($form->field['default'], $form->field['metadata']);
+
+                $forms[$key] = [
+					'default'  => $formDefault,
+					'metadata' => $formMeta,
+                ];
+			}
+
+            Plugin::view('generate-form-register', '/views/admin/form-sample', [
+				'dataFormSample' => $dataFormSample,
+				'forms' => $forms
+            ]);
         }
     }
-    static function save($result) {
+	static function pageSave(\SkillDo\Http\Request $request): void
+    {
+		$id = $request->input('id');
 
-        $data = Request::post();
+        $form = null;
 
-        unset($data['action']);
+		if(!empty($id)) {
 
-        unset($data['post_type']);
+            $form = Form_Register::get($id);
 
-        unset($data['cate_type']);
+			if(!have_posts($form)) {
+				echo Admin::alert('error', 'Không tìm thấy form có id là '. $id);
+				return;
+			}
 
-        if(!empty($data['id'])) {
+            $form->field = unserialize($form->field);
 
-            $id = (int)Request::post('id');
+			$fieldDefault = $form->field['default'] ?? null;
 
-            $form   = Form_Register::get($id);
+			$fieldMetadata = $form->field['metadata'] ?? null;
+		}
 
-            if(!have_posts($form)) {
-                $result['status'] = 'errpr';
-                $result['message'] = 'Form không tồn tại';
-                return $result;
-            }
+		[$formDefault, $formMeta] = static::form(
+            (isset($fieldDefault)) ? $fieldDefault : null,
+            (isset($fieldMetadata)) ? $fieldMetadata : null,
+		);
 
-            $form_data = [];
+        Plugin::view('generate-form-register', 'views/admin/form-save', [
+			'formDefault' => $formDefault,
+			'formMeta' => $formMeta,
+			'form' => $form
+        ]);
+	}
+	static function form($fieldDefault = null, $fieldMetadata = null): array
+    {
 
-            foreach ($data as $key => $value) {
-                if($key  == 'email_template') {
-                    $form_data[$key] = $value;
-                }
-                else {
-                    $form_data[$key] = trim(Str::clear($value));
-                }
-            }
+        $formDefault = form();
+        $formName = form();
+        $formName->switch('fieldName[use]', [
+            'label' => 'Sử dụng',
+            'start' => 2
+        ], (isset($fieldDefault['name']['use'])) ? $fieldDefault['name']['use'] : 1);
+        $formName->text('fieldName[field]', [
+            'label' => 'Tên Field data gửi lên',
+            'start' => 3
+        ], (isset($fieldDefault['name']['field'])) ? $fieldDefault['name']['field'] : 'name');
+        $formName->text('fieldName[label]', [
+            'label' => 'Tiêu đề Field',
+            'start' => 3
+        ], (isset($fieldDefault['name']['label'])) ? $fieldDefault['name']['label'] : 'Họ và tên');
+        $formName->switch('fieldName[required]', [
+            'label' => 'Không cho phép bỏ trống',
+            'start' => 2
+        ], (isset($fieldDefault['name']['required'])) ? $fieldDefault['name']['required'] : 1);
+        $formName->number('fieldName[limit]', [
+            'label' => 'Số ký tự nhập tối thiểu',
+            'start' => 2
+        ], (isset($fieldDefault['name']['limit'])) ? $fieldDefault['name']['limit'] : 0);
+        $formDefault->addGroup($formName, [
+            'start' => '<div class="store_wg_item row m-1"><h5 class="mt-3 mb-2">Trường họ tên</h5>',
+            'end' => '</div>',
+        ]);
 
-            if(!isset($form_data['is_live'])) $form_data['is_live'] = 0;
+        $formEmail = form();
+        $formEmail->switch('fieldEmail[use]', [
+            'label' => 'Sử dụng',
+            'start' => 2
+        ], (isset($fieldDefault['email']['use'])) ? $fieldDefault['email']['use'] : 1);
+        $formEmail->text('fieldEmail[field]', [
+            'label' => 'Tên Field data gửi lên',
+            'start' => 3
+        ], (isset($fieldDefault['email']['field'])) ? $fieldDefault['email']['field'] : 'email');
+        $formEmail->text('fieldEmail[label]', [
+            'label' => 'Tiêu đề Field',
+            'start' => 3
+        ], (isset($fieldDefault['email']['label'])) ? $fieldDefault['email']['label'] : 'Email');
+        $formEmail->switch('fieldEmail[required]', [
+            'label' => 'Không cho phép bỏ trống',
+            'start' => 2
+        ], (isset($fieldDefault['email']['required'])) ? $fieldDefault['email']['required'] : 1);
+        $formEmail->switch('fieldEmail[isEmail]', [
+            'label' => 'Kiểm tra cấu trúc email',
+            'start' => 2
+        ], (isset($fieldDefault['email']['isEmail'])) ? $fieldDefault['email']['isEmail'] : 0);
+        $formDefault->addGroup($formEmail, [
+            'start' => '<div class="store_wg_item row m-1"><h5 class="mt-3 mb-2">Trường email</h5>',
+            'end' => '</div>',
+        ]);
 
-            if(!isset($form_data['send_email'])) $form_data['send_email'] = 0;
+        $formPhone = form();
+        $formPhone->switch('fieldPhone[use]', [
+            'label' => 'Sử dụng',
+            'start' => 2
+        ], (isset($fieldDefault['phone']['use'])) ? $fieldDefault['phone']['use'] : 1);
+        $formPhone->text('fieldPhone[field]', [
+            'label' => 'Tên Field data gửi lên',
+            'start' => 3
+        ], (isset($fieldDefault['phone']['field'])) ? $fieldDefault['phone']['field'] : 'phone');
+        $formPhone->text('fieldPhone[label]', [
+            'label' => 'Tiêu đề Field',
+            'start' => 3
+        ], (isset($fieldDefault['phone']['label'])) ? $fieldDefault['phone']['label'] : 'Số điện thoại');
+        $formPhone->switch('fieldPhone[required]', [
+            'label' => 'Không cho phép bỏ trống',
+            'start' => 2
+        ], (isset($fieldDefault['phone']['required'])) ? $fieldDefault['phone']['required'] : 1);
+        $formPhone->switch('fieldPhone[isPhone]', [
+            'label' => 'Kiểm tra cấu trúc SĐT',
+            'start' => 2
+        ], (isset($fieldDefault['phone']['isPhone'])) ? $fieldDefault['phone']['isPhone'] : 0);
+        $formDefault->addGroup($formPhone, [
+            'start' => '<div class="store_wg_item row m-1"><h5 class="mt-3 mb-2">Trường số điện thoại</h5>',
+            'end' => '</div>',
+        ]);
 
-            if(!isset($form_data['is_redirect'])) $form_data['is_redirect'] = 0;
+        $formNote = form();
+        $formNote->switch('fieldMessage[use]', [
+            'label' => 'Sử dụng',
+            'start' => 2
+        ], (isset($fieldDefault['message']['use'])) ? $fieldDefault['message']['use'] : 1);
+        $formNote->text('fieldMessage[field]', [
+            'label' => 'Tên Field data gửi lên',
+            'start' => 3
+        ], (isset($fieldDefault['message']['field'])) ? $fieldDefault['message']['field'] : 'note');
+        $formNote->text('fieldMessage[label]', [
+            'label' => 'Tiêu đề Field',
+            'start' => 3
+        ], (isset($fieldDefault['message']['label'])) ? $fieldDefault['message']['label'] : 'Ghi chú');
+        $formNote->switch('fieldMessage[required]', [
+            'label' => 'Không cho phép bỏ trống',
+            'start' => 4
+        ], (isset($fieldDefault['message']['required'])) ? $fieldDefault['message']['required'] : 0);
+        $formDefault->addGroup($formNote, [
+            'start' => '<div class="store_wg_item row m-1"><h5 class="mt-3 mb-2">Trường ghi chú</h5>',
+            'end' => '</div>',
+        ]);
 
-            if(Form_Register::insert($form_data)) {
-                $result['status'] = 'success';
-                $result['message'] = 'Lưu dữ liệu thành công.';
-            }
-            else {
-                $result['status'] = 'error';
-                $result['message'] = 'Lưu dữ liệu thất bại';
-            }
-        }
-        else {
+        $formMeta = form();
+        $formMeta->repeater('metaData', ['label' => 'Các trường thêm', 'fields' => [
+            ['name' => 'name',  'type' => 'text',  'label' => 'Tiên biến', 'start' => 3],
+            ['name' => 'field', 'type' => 'text',  'label' => 'Tên Field data gửi lên', 'start' => 3],
+            ['name' => 'label', 'type' => 'text',  'label' => 'Tiêu đề hiển thị', 'language' => true, 'start' => 3],
+            ['name' => 'required', 'type' => 'switch',  'label' => 'Không cho phép bỏ trống', 'start' => 3],
+        ]], !empty($fieldMetadata) ? $fieldMetadata : []);
 
-            $key = Request::post('key');
 
-            if(empty($key)) {
-                $result['status'] = 'error';
-                $result['message'] = 'Key form không được để trống';
-                return $result;
-            }
-
-            if(Form_Register::count(Qr::set('key', $key)) != 0) {
-                $result['status'] = 'error';
-                $result['message'] = 'Key form đã tồn tại';
-                return $result;
-            }
-
-            if(!isset($data['is_live'])) $data['is_live'] = 1;
-
-            if(Form_Register::insert($data)) {
-                $result['status'] = 'success';
-                $result['message'] = 'Lưu dữ liệu thành công.';
-            }
-            else {
-                $result['status'] = 'error';
-                $result['message'] = 'Thêm dữ liệu thất bại';
-            }
-        }
-
-        return $result;
+		return [$formDefault, $formMeta];
     }
-    static function count(): void {
-        if(Template::isPage('post_index')) {
-            $post_type = Admin::getPostType();
-            if(!empty($post_type) && $post_type != 'post' && Form_Register::count(Qr::set('taxonomy',$post_type)) != 0) {
-                model('post')->update(['status' => 0], Qr::set('post_type', $post_type)->where('status', 1));
-                CacheHandler::save('generate_form_count_'.$post_type, 0);
+    static function breadcrumb($breadcrumb, $pageIndex, \SkillDo\Http\Request $request): array
+    {
+        if($pageIndex == 'home_system') {
+
+            $page = Url::segment(3);
+
+            if($page == 'generate_form_register') {
+
+                $view = request()->input('view');
+
+                $view = (empty($view)) ? 'index' : $view;
+
+                $breadcrumb['system_detail']['url'] = Url::admin('system/generate_form_register');
+
+                if( $view == 'edit') {
+                    $breadcrumb['system_detail']['active'] = false;
+                    $breadcrumb['generate_form_register_edit'] = [
+                        'active' => true,
+                        'label' => trans('Chỉnh sữa form')
+                    ];
+                }
+                if( $view == 'add') {
+                    $breadcrumb['system_detail']['active'] = false;
+                    $breadcrumb['generate_form_register_dd'] = [
+                        'active' => true,
+                        'label' => trans('Thêm form đăng ký')
+                    ];
+                }
             }
         }
-        ?>
-        <style>
-            .table.table tr.new td {
-                background-color: #e1f1ea;
-            }
-        </style>
-        <?php
+
+        return $breadcrumb;
     }
 }
-
+add_filter('admin_breadcrumb', 'GenerateFormRegisterAdmin::breadcrumb', 50, 3);
 add_filter('skd_system_tab', 'GenerateFormRegisterAdmin::register', 50);
-add_filter('system_generate_form_register_save', 'GenerateFormRegisterAdmin::save', 50);
-add_action('admin_footer', 'GenerateFormRegisterAdmin::count');

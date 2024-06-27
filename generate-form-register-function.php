@@ -1,73 +1,55 @@
 <?php
-Class Form_Register extends Model{
-    static string $table = 'generate_form_register';
-    public static function insert($generate_form_register = []) {
-        if (!empty($generate_form_register['id'])) {
-            $id             = (int) $generate_form_register['id'];
-            $update         = true;
-            $old_generate_form_register = static::get($id);
-            if (!$old_generate_form_register) return new SKD_Error('invalid_generate_form_register_id', __( 'ID trang không chính xác.' ));
-            $generate_form_register['name'] = (!empty($generate_form_register['name'])) ? $generate_form_register['name'] : $old_generate_form_register->name;
-            $generate_form_register['key'] = (!empty($generate_form_register['key'])) ? $generate_form_register['key'] : $old_generate_form_register->key;
-            $generate_form_register['field'] = (!empty($generate_form_register['field'])) ? $generate_form_register['field'] : $old_generate_form_register->field;
-            $generate_form_register['taxonomy'] = (!empty($generate_form_register['taxonomy'])) ? $generate_form_register['taxonomy'] : $old_generate_form_register->taxonomy;
-            $generate_form_register['taxonomy_config'] = (!empty($generate_form_register['taxonomy_config'])) ? $generate_form_register['taxonomy_config'] : $old_generate_form_register->taxonomy_config;
-            $generate_form_register['taxonomy_icon'] = (!empty($generate_form_register['taxonomy_icon'])) ? $generate_form_register['taxonomy_icon'] : $old_generate_form_register->taxonomy_icon;
-            $generate_form_register['is_live'] = (isset($generate_form_register['is_live'])) ? $generate_form_register['is_live'] : $old_generate_form_register->is_live;
-            $generate_form_register['is_redirect'] = (isset($generate_form_register['is_redirect'])) ? $generate_form_register['is_redirect'] : $old_generate_form_register->is_redirect;
-            $generate_form_register['send_email'] = (isset($generate_form_register['send_email'])) ? $generate_form_register['send_email'] : $old_generate_form_register->send_email;
-            $generate_form_register['email_template'] = (!empty($generate_form_register['email_template'])) ? $generate_form_register['email_template'] : $old_generate_form_register->email_template;
-            $generate_form_register['url_redirect'] = (isset($generate_form_register['url_redirect'])) ? $generate_form_register['url_redirect'] : $old_generate_form_register->url_redirect;
-        }
-        else {
-            $update = false;
-        }
+Class Form_Register extends \SkillDo\Model\Model {
 
-        $name               = (!empty($generate_form_register['name'])) ?       Str::clear($generate_form_register['name']) : '';
-        $key                = (!empty($generate_form_register['key'])) ?        Str::clear($generate_form_register['key']) : '';
-        $field              = (!empty($generate_form_register['field'])) ?      Str::clear($generate_form_register['field']) : '';
-        $url_redirect       = (isset($generate_form_register['url_redirect'])) ? Str::clear($generate_form_register['url_redirect']) : '';
-        $taxonomy           = (!empty($generate_form_register['taxonomy'])) ?   Str::clear($generate_form_register['taxonomy']) : '';
-        $taxonomy_config    = (!empty($generate_form_register['taxonomy_config'])) ? Str::clear($generate_form_register['taxonomy_config']) : '';
-        $email_template     = (!empty($generate_form_register['email_template'])) ? $generate_form_register['email_template'] : '';
-        $taxonomy_icon      = (!empty($generate_form_register['taxonomy_icon'])) ? FileHandler::handlingUrl($generate_form_register['taxonomy_icon']) : '';
-        $is_live            = (isset($generate_form_register['is_live'])) ?     (int)$generate_form_register['is_live'] : 0;
-        $is_redirect        = (isset($generate_form_register['is_redirect'])) ?     (int)$generate_form_register['is_redirect'] : 0;
-        $send_email         = (isset($generate_form_register['send_email'])) ?  (int)$generate_form_register['send_email'] : 0;
-        $data = compact( 'name', 'key','field','taxonomy', 'taxonomy_icon','taxonomy_config','is_live', 'send_email', 'email_template', 'is_redirect', 'url_redirect' );
-        $data = apply_filters( 'pre_insert_generate_form_register_data', $data, $generate_form_register, $update ? (int) $id : null );
-        $model 	= model(self::$table);
-        if ($update) {
-            $model->update($data, Qr::set($id));
-            $generate_form_register_id = (int) $id;
-        } else {
-            $generate_form_register_id = $model->add($data);
-        }
-        return apply_filters( 'after_insert_generate_form_register', $generate_form_register_id, $generate_form_register, $data, $update ? (int) $id : null  );
-    }
-    public static function delete($generate_form_registerID = 0) {
-        $generate_form_registerID = (int)$generate_form_registerID;
-        if( $generate_form_registerID == 0 ) return false;
-        $count = static::count( $generate_form_registerID );
-        if($count == 1) {
-            $model 	= model(self::$table);
-            do_action('delete_generate_form_register', $generate_form_registerID );
-            if($model->delete(Qr::set($generate_form_registerID))) {
-                do_action('delete_generate_form_register_success', $generate_form_registerID );
-                return [$generate_form_registerID];
-            }
-        }
-        return false;
-    }
-    public static function taxonomyConfig($taxonomyConfig = '') {
-        if(empty($taxonomyConfig)) return [];
-        $taxonomyConfig = explode("\n", $taxonomyConfig);
-        foreach ($taxonomyConfig as $value) eval('$'.$value.';');
-        if(!isset($name)) $name = '';
-        if(!isset($icon)) $icon = '';
-        return compact('name','icon');
-    }
-    public static function config($field = '', $type = '') {
+    static string $table = 'generate_form_register';
+
+    static array $columns = [
+        'name'  => ['string'],
+        'key'   => ['string'],
+        'field' => ['array', []],
+        'url_redirect'  => ['string'],
+        'email_template' => ['string'],
+        'is_live'   => ['int', 1],
+        'is_redirect' => ['int', 0],
+        'send_email' => ['int', 0],
+    ];
+
+    static array $rules = [
+        'add'               => [
+            'require' => [
+                'key' => 'Form Key không được để trống'
+            ]
+        ],
+    ];
+}
+
+class Form_Register_Result extends \SkillDo\Model\Model
+{
+    static string $table = 'form_register_result';
+
+    static array $columns = [
+        'name' => ['string'],
+        'email' => ['string'],
+        'phone' => ['string'],
+        'message' => ['string'],
+        'status' => ['int', 0],
+        'form_key' => ['string'],
+    ];
+
+    static array $rules = [
+        'created'           => true,
+        'updated'           => true,
+        'add'               => [
+            'require' => [
+                'form_key' => 'Form Key không được để trống'
+            ]
+        ],
+    ];
+}
+
+Class Form_Register_Helper {
+    static function config($field = '', $type = ''): array
+    {
 
         if(empty($field)) return [];
 
@@ -100,74 +82,72 @@ Class Form_Register extends Model{
 
         return $config;
     }
-    public static function generateCodeTaxonomy($form = []) {
+    static function generateCode($form = []): false|string
+    {
+        $formKey = $form->key;
 
-        $taxonomy_key = $form->taxonomy;
+        $fields = unserialize($form->field);
 
-        $config = array_merge(['name' => '', 'icon' => '<img src="'.Path::plugin('generate-form-register').'/icon-email.png" />'],Form_Register::taxonomyConfig($form->taxonomy_config));
+        $storage = Storage::make('views/plugins/generate-form-register/taxonomy');
 
-        if(empty($config['icon'])) $config['icon'] = '<img src="'.Path::plugin('generate-form-register').'/icon-email.png" />';
+		$taxonomyString = $storage->get('taxonomy.php');
 
-        $fields = Form_Register::config($form->field);
+        $taxonomyString = str_replace('{{formKey}}', $formKey, $taxonomyString);
 
-        $cache_id = 'generate_form_count_'.$taxonomy_key;
+        $taxonomyString = str_replace('{{name}}', $form->name, $taxonomyString);
 
-        $count =  CacheHandler::get($cache_id);
+        $columnsNew = '';
 
-        if(!is_numeric($count)) {
-            $count = Posts::count(Qr::set('post_type', $taxonomy_key)->where('status', 1));
-            CacheHandler::save($cache_id, $count);
+        foreach ($fields['default'] as $column => $input) {
+
+            if(empty($input['use'])) continue;
+
+            $columnCode = $storage->get('column-text.php');
+
+            $columnCode = str_replace('{{name}}', $column, $columnCode);
+
+            $columnCode = str_replace('{{label}}', $input['label'], $columnCode);
+
+            $columnsNew .= $columnCode."\n";
         }
 
-        ob_start();?>
-        add_filter('admin_post_<?php echo $taxonomy_key;?>_controllers_index_select', function ($select) { return ['id', 'image', 'title', 'slug', 'excerpt', 'content', 'post_type', 'public', 'status', 'order', 'created', 'seo_title', 'seo_description', 'seo_keywords'];});
-        AdminMenu::addSub('marketing','<?php echo $taxonomy_key;?>','<?php echo $config['name'];?>', 'post?post_type=<?php echo $taxonomy_key;?>', ['count' => <?php echo $count;?>]);
-        Taxonomy::addPost('<?php echo $taxonomy_key;?>',
-            array(
-                'labels' => array(
-                    'name'          => '<?php echo $config['name'];?>',
-                    'singular_name' => '<?php echo $config['name'];?>',
-                ),
-                'public' => false,
-                'show_admin_column'  => false,
-                'capabilities' => array(
-                    'view'      => 'view_email_register',
-                    'edit'      => 'edit__<?php echo $taxonomy_key;?>',
-                    'delete'    => 'delete_email_register',
-                ),
-                'supports' => ['group' => ['info']]
-            )
-        );
-        function generate_form_register_<?php echo $taxonomy_key;?>_single_row( $columns, $item ) {
-            return '<tr class="tr_'.$item->id.' '.(($item->status == 1) ? 'new' : '').'">';
-        }
-        add_filter('single_row_post_<?php echo $taxonomy_key;?>', 'generate_form_register_<?php echo $taxonomy_key;?>_single_row', 10, 2);
+        foreach ($fields['metadata'] as $column => $input) {
 
-        function generate_form_register_<?php echo $taxonomy_key;?>_column( $columns ) {
-            $columnsnew['cb']   	= 'cb';
-            <?php foreach ($fields as $key => $input) { if($input['table_show'] == 'true') echo '$columnsnew["'.$input['field'].'"] = "'.$input['label'].'";';} ?>
-            $columnsnew['created'] 	= 'Ngày đăng ký';
-            $columnsnew['action'] 	= 'Hành động';
-            return $columnsnew;
-        }
-        add_filter('manage_post_<?php echo $taxonomy_key;?>_columns', 'generate_form_register_<?php echo $taxonomy_key;?>_column', 10);
+            $columnCode = $storage->get('column-metabox-text.php');
 
-        function generate_form_register_data_<?php echo $taxonomy_key;?>_column( $column_name, $item ) {
-            switch ( $column_name ) {
-                <?php foreach ($fields as $key => $input) {
-                    if($input['type'] == 'data' && $input['table_show'] == 'true') {
-                        echo 'case "'.$input['field'].'":echo ($item->'.$input['field'].') ? apply_filters(\'generate_admin_table_'.$taxonomy_key.'_data\', $item->'.$input['field'].', \''.$input['field'].'\') : ""; break;';
-                    }
-                    if($input['type'] == 'metadata' && $input['table_show'] == 'true') {
-                        echo 'case "'.$input['field'].'":$metadata = Posts::getMeta($item->id, \''.$input['field'].'\', true); echo apply_filters(\'generate_admin_table_'.$taxonomy_key.'_data\', $metadata, \''.$input['field'].'\'); break;';
-                    }
-                } ?>
+            $columnCode = str_replace('{{formKey}}', $formKey, $columnCode);
+
+            $columnCode = str_replace('{{name}}', $input['name'], $columnCode);
+
+            $columnCode = str_replace('{{label}}', $input['label'], $columnCode);
+
+            $columnsNew .= $columnCode."\n";
+        }
+
+        return str_replace('{{columnsNew}}', $columnsNew, $taxonomyString);
+    }
+    static function build(): void
+    {
+        $storage = Storage::make('views/plugins/generate-form-register/taxonomy');
+
+        if($storage->fileExists('taxonomy.build.php')) {
+            $storage->delete('taxonomy.build.php');
+        }
+
+        $forms = Form_Register::gets();
+
+        $codeMain = '<?php'."\n";
+
+        foreach ($forms as $key => $form) {
+
+            if($form->is_live == 1) {
+                $code = '';
+                $code = static::generateCode($form);
+                $code .= "\n";
+                $codeMain .= $code;
             }
         }
-        add_action('manage_post_<?php echo $taxonomy_key;?>_custom_column', 'generate_form_register_data_<?php echo $taxonomy_key;?>_column',10,2);
-        <?php
-        $result = ob_get_contents();
-        ob_end_clean();
-        return $result;
+
+        $storage->put('taxonomy.build.php', $codeMain);
     }
 }

@@ -1,43 +1,43 @@
 <div class="clearfix"></div>
 <div class="wheel-box">
-    <?php foreach ($forms as $key => $form) {?>
-        <div class="box item-form tr_<?php echo $form->id?>" data-form-id="<?php echo $form->id?>">
-            <div class="header" style="padding:0px 10px;"> <h2><?php echo $form->name?></h2> </div>
+   @foreach ($forms as $key => $form)
+        <div class="box mb-2 item-form tr_{{$form->id}}" data-form-id="{{$form->id}}">
+            <div class="box-header"> <h4 class="box-title">{{$form->name}}</h4> </div>
             <div class="box-content" style="padding: 10px;">
                 <div class="wheel-count row">
                     <div class="col-md-2 text-center">
                         <div class="wheel-shadow">
                             <h5>TRẠNG THÁI</h5>
-                            <p><?php echo $form->is_live ? __('SỬ DỤNG') : __('TẮT'); ?></p>
+                            <p>{{$form->is_live ? __('SỬ DỤNG') : __('TẮT')}}</p>
                         </div>
                     </div>
                     <div class="col-md-2 text-center">
                         <div class="wheel-shadow">
                             <h5>Gửi email</h5>
-                            <p><?php echo $form->send_email ? __('SỬ DỤNG') : __('TẮT'); ?></p>
+                            <p>{{$form->send_email ? __('Bật') : __('tắt')}}</p>
                         </div>
                     </div>
-                    <div class="col-md-3 text-center">
+                    <div class="col-md-2 text-center">
                         <div class="wheel-shadow">
-                            <h5>TAXONOMY</h5>
-                            <p><?php echo $form->taxonomy;?></p>
+                            <h5>Chuyển hướng</h5>
+                            <p>{{$form->url_redirect ? __('Bật') : __('Tắt')}}</p>
                         </div>
                     </div>
                     <div class="col-md-4 text-center">
                         <div class="wheel-shadow wheel-count">
                             <h5>FILETES</h5>
-                            <p style="font-size:14px; margin-bottom:3px;">generate_form_register_<?php echo $form->key;?>_error</p>
-                            <p style="font-size:14px; margin-bottom:3px;">generate_form_register_<?php echo $form->key;?>_data</p>
+                            <p style="font-size:14px; margin-bottom:3px;">generate_form_register_{{$form->key}}_error</p>
+                            <p style="font-size:14px; margin-bottom:3px;">generate_form_register_{{$form->key}}_data</p>
                         </div>
                     </div>
                     <div class="col-md-1">
-                        <a class="btn btn-blue btn-block" href="<?php echo Url::admin('system/generate_form_register?view=edit&id='.$form->id);?>"><i class="fad fa-cog"></i></a>
-                        <?php echo Admin::btnDelete(['module' => 'Form_Register', 'id' => $form->id, 'style' => 'display:block;width:100%;margin-top:10px;']);?>
+                        <a class="btn btn-blue btn-block" href="{!! Url::admin('system/generate_form_register?view=edit&id='.$form->id) !!}"><i class="fad fa-cog"></i></a>
+                        {!! Admin::btnDelete(['module' => 'Form_Register', 'id' => $form->id]) !!}
                     </div>
                 </div>
             </div>
         </div>
-    <?php } ?>
+    @endforeach
 </div>
 <style>
     .item-form .wheel-count h5 {

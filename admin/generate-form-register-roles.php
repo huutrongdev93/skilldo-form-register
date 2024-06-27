@@ -11,7 +11,8 @@ Class Form_Register_Role {
         );
         return $group;
     }
-    public function addLabel( $label ) {
+    public function addLabel( $label ): array
+    {
         return array_merge($label, static::capabilities());
     }
     static public function capabilities() {
