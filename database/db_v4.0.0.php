@@ -22,7 +22,7 @@ return new class () extends Migration {
                 $table->text('message')->collate('utf8mb4_unicode_ci')->nullable();
                 $table->integer('status')->default(0);
                 $table->string('form_key', 50)->collate('utf8mb4_unicode_ci');
-                $table->dateTime('created');
+                $table->dateTime('created')->default('CURRENT_TIMESTAMP');
                 $table->dateTime('updated')->nullable();
                 $table->index('id');
                 $table->index('form_key');
@@ -35,7 +35,7 @@ return new class () extends Migration {
                 $table->string('meta_key', 100)->collate('utf8mb4_unicode_ci')->nullable();
                 $table->longText('meta_value')->collate('utf8mb4_unicode_ci')->nullable();
                 $table->integer('order')->default(0);
-                $table->dateTime('created');
+                $table->dateTime('created')->default('CURRENT_TIMESTAMP');
                 $table->dateTime('updated')->nullable();
                 $table->index('object_id');
                 $table->index('meta_key');
