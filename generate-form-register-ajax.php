@@ -22,7 +22,7 @@ Class Form_Register_Ajax {
             if(have_posts($form) && have_posts($post)) {
 
                 if($form->is_live == 0) {
-                    response()->error(trans('Thật xin lỗi! Form này đã kết thúc chương trình đăng ký'));
+                    response()->error(trans('register.gfr.off'));
                 }
 
                 $fields = unserialize($form->field);
@@ -149,13 +149,13 @@ Class Form_Register_Ajax {
 
                         do_action('generate_form_register_success', $form);
 
-                        response()->success(trans('Đăng ký thành công'), $result);
+                        response()->success(trans('register.gfr.success'), $result);
                     }
                 }
             }
         }
 
-        response()->error(trans('Đăng ký không thành công'));
+        response()->error(trans('register.gfr.fail'));
     }
 
     #[NoReturn]
