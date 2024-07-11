@@ -19,6 +19,7 @@ class generate_form_register {
 
     public function active(): void
     {
+        (include 'database/database.php')->up();
         Form_Register_Active::active();
     }
 

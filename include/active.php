@@ -3,14 +3,8 @@ Class Form_Register_Active {
 
     public static function active(): void
     {
-        static::createDatabase();
         static::createForm();
         static::addRole();
-    }
-
-    public static function createDatabase(): void
-    {
-        (include 'database/database.php')->up();
     }
 
     public static function createForm(): void
