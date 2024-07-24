@@ -1,12 +1,4 @@
 <?php
-/**
-Plugin name     : Generate Form Register
-Plugin class    : generate_form_register
-Plugin uri      : http://sikido.vn
-Description     : Trình xây dựng form đăng ký
-Author          : Nguyễn Hữu Trọng
-Version         : 4.0.0
- */
 const G_FORM_REGISTER_VERSION = '4.0.0';
 
 class generate_form_register {
