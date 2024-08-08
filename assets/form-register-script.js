@@ -11,13 +11,13 @@ $(function(){
 
 		data.action = 'Form_Register_Ajax::register';
 
-		loading.loading()
+		loading.start()
 
 		request.post(ajax, data).then(function(response) {
 
 			SkilldoMessage.response(response);
 
-			loading.success()
+			loading.stop()
 
 			if( response.status === 'success' ) {
 

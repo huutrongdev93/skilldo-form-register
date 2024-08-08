@@ -67,13 +67,13 @@
 
             load.show();
 
-	        button.loading();
+	        button.start();
 
             request.post(ajax, data).then(function(response) {
 
                 load.hide();
 
-	            button.success();
+	            button.stop();
 
                 SkilldoMessage.response(response);
             });
