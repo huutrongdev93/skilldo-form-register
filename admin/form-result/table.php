@@ -67,7 +67,7 @@ class AdminFormRegisterTable extends SKDObjectTable {
 
         $listButton['delete'] = Admin::btnDelete([
             'id' => $item->id,
-            'module' => $module,
+            'model' => $module,
         ]);
 
         return $listButton;

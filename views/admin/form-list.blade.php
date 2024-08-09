@@ -32,7 +32,7 @@
                     </div>
                     <div class="col-md-1">
                         <a class="btn btn-blue btn-block" href="{!! Url::admin('system/generate_form_register?view=edit&id='.$form->id) !!}"><i class="fad fa-cog"></i></a>
-                        {!! Admin::btnDelete(['module' => 'Form_Register', 'id' => $form->id]) !!}
+                        {!! Admin::btnDelete(['model' => 'Form_Register', 'id' => $form->id]) !!}
                     </div>
                 </div>
             </div>
