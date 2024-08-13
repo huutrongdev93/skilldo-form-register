@@ -3,13 +3,13 @@ function form_register_result_product_form_contact_menu() {
 
 	$cacheId = 'generate_form_count_product_form_contact';
 
-	$count =  CacheHandler::get($cacheId);
+	$count =  \SkillDo\Cache::get($cacheId);
 
 	if(!is_numeric($count)) {
 
 		$count = Form_Register_Result::count(Qr::set('form_key', 'product_form_contact')->where('status', 1));
 
-		CacheHandler::save($cacheId, $count);
+		\SkillDo\Cache::save($cacheId, $count);
 	}
 
 	AdminMenu::addSub('marketing', 'form_register_result_product_form_contact','Đăng ký liên hệ tư vấn', 'plugins/form_register_result?form-key=product_form_contact', [
@@ -41,13 +41,13 @@ function form_register_result_email_register_menu() {
 
 	$cacheId = 'generate_form_count_email_register';
 
-	$count =  CacheHandler::get($cacheId);
+	$count =  \SkillDo\Cache::get($cacheId);
 
 	if(!is_numeric($count)) {
 
 		$count = Form_Register_Result::count(Qr::set('form_key', 'email_register')->where('status', 1));
 
-		CacheHandler::save($cacheId, $count);
+		\SkillDo\Cache::save($cacheId, $count);
 	}
 
 	AdminMenu::addSub('marketing', 'form_register_result_email_register','Đăng ký nhận tin', 'plugins/form_register_result?form-key=email_register', [

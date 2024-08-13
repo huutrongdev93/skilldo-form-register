@@ -107,7 +107,7 @@ Class Form_Register_Ajax {
 
                     if(!is_skd_error($res)) {
 
-                        CacheHandler::delete('generate_form_count_'.$form->key);
+                        \SkillDo\Cache::delete('generate_form_count_'.$form->key);
 
                         if(have_posts($metadata)) {
                             foreach ($metadata as $meta_key => $meta_value) {

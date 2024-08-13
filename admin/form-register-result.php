@@ -66,13 +66,13 @@ Class FormRegisterResultAdmin {
 
                     $cacheId = 'generate_form_count_'.$formKey;
 
-                    $count =  CacheHandler::get($cacheId);
+                    $count =  \SkillDo\Cache::get($cacheId);
 
                     if(!is_numeric($count) || $count > 0) {
 
                         Form_Register_Result::where('status', 1)->update(['status' => 0]);
 
-                        CacheHandler::delete($cacheId);
+                        \SkillDo\Cache::delete($cacheId);
                     }
                 }
             }

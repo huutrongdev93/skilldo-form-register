@@ -1,5 +1,5 @@
 <?php
-const G_FORM_REGISTER_VERSION = '4.0.0';
+const G_FORM_REGISTER_VERSION = '4.0.1';
 
 class generate_form_register {
 
