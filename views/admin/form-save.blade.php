@@ -43,7 +43,9 @@
                                 <p style="font-size:13px;color:#999;">Cho phép khách hàng đăng ký sử dụng form</p>
                             </div>
                             <div class="col-md-9">
-                                <input type="checkbox" name="is_live" id="is_live" class="icheck " value="1" {!! (isset($form) && $form->is_live == 1) ? 'checked' : '' !!}>
+                                <div class="form-check">
+                                    <input type="checkbox" name="is_live" id="is_live" class="form-check-input" value="1" {!! (isset($form) && $form->is_live == 1) ? 'checked' : '' !!}>
+                                </div>
                             </div>
                         </div>
 
@@ -53,7 +55,9 @@
                                 <p style="font-size:13px; color:#999;">Bạn cần cấu hình email template để gửi được email theo ý muốn</p>
                             </div>
                             <div class="col-md-9">
-                                <input type="checkbox" name="send_email" id="send_email" class="icheck " value="1" {!! (isset($form) && $form->send_email == 1) ? 'checked' : '' !!}>
+                                <div class="form-check">
+                                    <input type="checkbox" name="send_email" id="send_email" class="form-check-input" value="1" {!! (isset($form) && $form->send_email == 1) ? 'checked' : '' !!}>
+                                </div>
                             </div>
                         </div>
 
@@ -63,7 +67,9 @@
                                 <p style="font-size:13px; color:#999;">Sau khi đăng ký thành công trang sẽ được chuyển hướng đi</p>
                             </div>
                             <div class="col-md-9">
-                                <input type="checkbox" name="is_redirect" id="is_redirect" class="icheck " value="1" {!! (isset($form) && $form->is_redirect == 1) ? 'checked' : '' !!}>
+                                <div class="form-check">
+                                    <input type="checkbox" name="is_redirect" id="is_redirect" class="form-check-input" value="1" {!! (isset($form) && $form->is_redirect == 1) ? 'checked' : '' !!}>
+                                </div>
                             </div>
                         </div>
 

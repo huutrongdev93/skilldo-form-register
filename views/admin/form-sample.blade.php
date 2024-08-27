@@ -13,7 +13,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="">Form name</label>
-                                <input type="text" class="form-control" name="name" value="{!! $form->name !!}">
+                                <input type="text" class="form-control" name="{!! $form->key !!}[name]" value="{!! $form->name !!}">
                             </div>
                             <button class="btn btn-green btn-block js_form_btn_add w-100"><i class="fad fa-plus"></i> Tạo Form</button>
                         </div>
@@ -59,9 +59,9 @@
 
             let data = $( ':input', box ).serializeJSON();
 
-            data.system_tab_key = $('input[name="system_tab_key"]').val();
+            data.formId = box.attr('data-form-id');
 
-            data.action     =  'Form_Register_Ajax::adminSave';
+            data.action     =  'Form_Register_Ajax::quickCreate';
 
             let load = $(this).find('.loading');
 

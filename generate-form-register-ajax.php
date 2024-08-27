@@ -167,17 +167,16 @@ Class Form_Register_Ajax {
 
             $id  = $request->input('id');
 
-            $data = $request->input();
-
-            unset($data['action']);
-
-            unset($data['post_type']);
-
-            unset($data['cate_type']);
-
             if(empty($key)) {
                 response()->error('Key form không được để trống');
             }
+
+            $data = $request->input();
+
+            unset($data['action']);
+            unset($data['post_type']);
+            unset($data['cate_type']);
+            unset($data['csrf_test_name']);
 
             $field = [
                 'default' => [],
@@ -227,6 +226,8 @@ Class Form_Register_Ajax {
 
                     response()->error('Key form đã tồn tại');
                 }
+
+                if(!isset($data['key'])) $data['key'] = $key;
 
                 if(!isset($data['is_live'])) $data['is_live'] = 1;
 
@@ -283,6 +284,89 @@ Class Form_Register_Ajax {
 
                 response()->success(trans('ajax.update.success'));
             }
+        }
+
+        response()->error(trans('ajax.update.error'));
+    }
+
+    #[NoReturn]
+    static function quickCreate(Request $request, $model): void
+    {
+        if($request->isMethod('post')) {
+
+            $key = $request->input('key');
+
+            $formId = $request->input('formId');
+
+            if(empty($key)) {
+                response()->error('Key form không được để trống');
+            }
+
+            if(empty($formId)) {
+                response()->error('Id form không được để trống');
+            }
+
+            $data = $request->input($formId);
+
+            $field = [
+                'default' => [],
+                'metadata' => []
+            ];
+
+            if(empty($data['fieldName'])) {
+                response()->error('Cấu hình cho trường name chưa có');
+            }
+            if(empty($data['fieldEmail'])) {
+                response()->error('Cấu hình cho trường email chưa có');
+            }
+            if(empty($data['fieldPhone'])) {
+                response()->error('Cấu hình cho trường phone chưa có');
+            }
+            if(empty($data['fieldMessage'])) {
+                response()->error('Cấu hình cho trường message chưa có');
+            }
+
+            $field['default']['name'] = $data['fieldName'];
+
+            $field['default']['email'] = $data['fieldEmail'];
+
+            $field['default']['phone'] = $data['fieldPhone'];
+
+            $field['default']['message'] = $data['fieldMessage'];
+
+            unset($data['fieldName']);
+
+            unset($data['fieldEmail']);
+
+            unset($data['fieldPhone']);
+
+            unset($data['fieldMessage']);
+
+            if(!empty($data['metaData'])) {
+                $field['metadata'] = $data['metaData'];
+                unset($data['metaData']);
+            }
+
+            $data['field'] = $field;
+
+            if(Form_Register::count(Qr::set('key', $key)) != 0) {
+
+                response()->error('Key form đã tồn tại');
+            }
+
+            if(!isset($data['key'])) $data['key'] = $key;
+
+            if(!isset($data['is_live'])) $data['is_live'] = 1;
+
+            $error = Form_Register::insert($data);
+
+            if(is_skd_error($error)) {
+                response()->error($error);
+            }
+
+            Form_Register_Helper::build();
+
+            response()->success(trans('ajax.add.success'));
         }
 
         response()->error(trans('ajax.update.error'));
@@ -609,6 +693,7 @@ Class Form_Register_Ajax {
 }
 Ajax::client('Form_Register_Ajax::register');
 Ajax::admin('Form_Register_Ajax::adminSave');
+Ajax::admin('Form_Register_Ajax::quickCreate');
 Ajax::admin('Form_Register_Ajax::load');
 Ajax::admin('Form_Register_Ajax::export');
 

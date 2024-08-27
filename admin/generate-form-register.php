@@ -33,6 +33,7 @@ class GenerateFormRegisterAdmin {
         }
 
         if($view == 'sample') {
+
             $dataFormSample = [
                 (object)[
                     'key'               => 'email_register',
@@ -172,7 +173,7 @@ class GenerateFormRegisterAdmin {
 
 			foreach ($dataFormSample as $key => $form) {
 
-                [$formDefault, $formMeta] = static::form($form->field['default'], $form->field['metadata']);
+                [$formDefault, $formMeta] = static::form($form->field['default'], $form->field['metadata'], $form->key);
 
                 $forms[$key] = [
 					'default'  => $formDefault,
@@ -219,28 +220,28 @@ class GenerateFormRegisterAdmin {
 			'form' => $form
         ]);
 	}
-	static function form($fieldDefault = null, $fieldMetadata = null): array
+	static function form($fieldDefault = null, $fieldMetadata = null, $key = null): array
     {
-
         $formDefault = form();
         $formName = form();
-        $formName->switch('fieldName[use]', [
+        $name = (!empty($key)) ? $key.'[fieldName]' : 'fieldName';
+        $formName->switch($name.'[use]', [
             'label' => 'Sử dụng',
             'start' => 2
         ], (isset($fieldDefault['name']['use'])) ? $fieldDefault['name']['use'] : 1);
-        $formName->text('fieldName[field]', [
+        $formName->text($name.'[field]', [
             'label' => 'Tên Field data gửi lên',
             'start' => 3
         ], (isset($fieldDefault['name']['field'])) ? $fieldDefault['name']['field'] : 'name');
-        $formName->text('fieldName[label]', [
+        $formName->text($name.'[label]', [
             'label' => 'Tiêu đề Field',
             'start' => 3
         ], (isset($fieldDefault['name']['label'])) ? $fieldDefault['name']['label'] : 'Họ và tên');
-        $formName->switch('fieldName[required]', [
+        $formName->switch($name.'[required]', [
             'label' => 'Không cho phép bỏ trống',
             'start' => 2
         ], (isset($fieldDefault['name']['required'])) ? $fieldDefault['name']['required'] : 1);
-        $formName->number('fieldName[limit]', [
+        $formName->number($name.'[limit]', [
             'label' => 'Số ký tự nhập tối thiểu',
             'start' => 2
         ], (isset($fieldDefault['name']['limit'])) ? $fieldDefault['name']['limit'] : 0);
@@ -250,23 +251,24 @@ class GenerateFormRegisterAdmin {
         ]);
 
         $formEmail = form();
-        $formEmail->switch('fieldEmail[use]', [
+        $name = (!empty($key)) ? $key.'[fieldEmail]' : 'fieldEmail';
+        $formEmail->switch($name.'[use]', [
             'label' => 'Sử dụng',
             'start' => 2
         ], (isset($fieldDefault['email']['use'])) ? $fieldDefault['email']['use'] : 1);
-        $formEmail->text('fieldEmail[field]', [
+        $formEmail->text($name.'[field]', [
             'label' => 'Tên Field data gửi lên',
             'start' => 3
         ], (isset($fieldDefault['email']['field'])) ? $fieldDefault['email']['field'] : 'email');
-        $formEmail->text('fieldEmail[label]', [
+        $formEmail->text($name.'[label]', [
             'label' => 'Tiêu đề Field',
             'start' => 3
         ], (isset($fieldDefault['email']['label'])) ? $fieldDefault['email']['label'] : 'Email');
-        $formEmail->switch('fieldEmail[required]', [
+        $formEmail->switch($name.'[required]', [
             'label' => 'Không cho phép bỏ trống',
             'start' => 2
         ], (isset($fieldDefault['email']['required'])) ? $fieldDefault['email']['required'] : 1);
-        $formEmail->switch('fieldEmail[isEmail]', [
+        $formEmail->switch($name.'[isEmail]', [
             'label' => 'Kiểm tra cấu trúc email',
             'start' => 2
         ], (isset($fieldDefault['email']['isEmail'])) ? $fieldDefault['email']['isEmail'] : 0);
@@ -276,23 +278,24 @@ class GenerateFormRegisterAdmin {
         ]);
 
         $formPhone = form();
-        $formPhone->switch('fieldPhone[use]', [
+        $name = (!empty($key)) ? $key.'[fieldPhone]' : 'fieldPhone';
+        $formPhone->switch($name.'[use]', [
             'label' => 'Sử dụng',
             'start' => 2
         ], (isset($fieldDefault['phone']['use'])) ? $fieldDefault['phone']['use'] : 1);
-        $formPhone->text('fieldPhone[field]', [
+        $formPhone->text($name.'[field]', [
             'label' => 'Tên Field data gửi lên',
             'start' => 3
         ], (isset($fieldDefault['phone']['field'])) ? $fieldDefault['phone']['field'] : 'phone');
-        $formPhone->text('fieldPhone[label]', [
+        $formPhone->text($name.'[label]', [
             'label' => 'Tiêu đề Field',
             'start' => 3
         ], (isset($fieldDefault['phone']['label'])) ? $fieldDefault['phone']['label'] : 'Số điện thoại');
-        $formPhone->switch('fieldPhone[required]', [
+        $formPhone->switch($name.'[required]', [
             'label' => 'Không cho phép bỏ trống',
             'start' => 2
         ], (isset($fieldDefault['phone']['required'])) ? $fieldDefault['phone']['required'] : 1);
-        $formPhone->switch('fieldPhone[isPhone]', [
+        $formPhone->switch($name.'[isPhone]', [
             'label' => 'Kiểm tra cấu trúc SĐT',
             'start' => 2
         ], (isset($fieldDefault['phone']['isPhone'])) ? $fieldDefault['phone']['isPhone'] : 0);
@@ -302,19 +305,20 @@ class GenerateFormRegisterAdmin {
         ]);
 
         $formNote = form();
-        $formNote->switch('fieldMessage[use]', [
+        $name = (!empty($key)) ? $key.'[fieldMessage]' : 'fieldMessage';
+        $formNote->switch($name.'[use]', [
             'label' => 'Sử dụng',
             'start' => 2
         ], (isset($fieldDefault['message']['use'])) ? $fieldDefault['message']['use'] : 1);
-        $formNote->text('fieldMessage[field]', [
+        $formNote->text($name.'[field]', [
             'label' => 'Tên Field data gửi lên',
             'start' => 3
         ], (isset($fieldDefault['message']['field'])) ? $fieldDefault['message']['field'] : 'note');
-        $formNote->text('fieldMessage[label]', [
+        $formNote->text($name.'[label]', [
             'label' => 'Tiêu đề Field',
             'start' => 3
         ], (isset($fieldDefault['message']['label'])) ? $fieldDefault['message']['label'] : 'Ghi chú');
-        $formNote->switch('fieldMessage[required]', [
+        $formNote->switch($name.'[required]', [
             'label' => 'Không cho phép bỏ trống',
             'start' => 4
         ], (isset($fieldDefault['message']['required'])) ? $fieldDefault['message']['required'] : 0);
@@ -324,13 +328,13 @@ class GenerateFormRegisterAdmin {
         ]);
 
         $formMeta = form();
-        $formMeta->repeater('metaData', ['label' => 'Các trường thêm', 'fields' => [
+        $name = (!empty($key)) ? $key.'[metaData]' : 'metaData';
+        $formMeta->repeater($name, ['label' => 'Các trường thêm', 'fields' => [
             ['name' => 'name',  'type' => 'text',  'label' => 'Tiên biến', 'start' => 3],
             ['name' => 'field', 'type' => 'text',  'label' => 'Tên Field data gửi lên', 'start' => 3],
             ['name' => 'label', 'type' => 'text',  'label' => 'Tiêu đề hiển thị', 'language' => true, 'start' => 3],
             ['name' => 'required', 'type' => 'switch',  'label' => 'Không cho phép bỏ trống', 'start' => 3],
         ]], !empty($fieldMetadata) ? $fieldMetadata : []);
-
 
 		return [$formDefault, $formMeta];
     }
