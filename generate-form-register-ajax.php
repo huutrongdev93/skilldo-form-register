@@ -1,5 +1,6 @@
 <?php
 use JetBrains\PhpStorm\NoReturn;
+use SkillDo\Mail;
 use SkillDo\Validate\Rule;
 use SkillDo\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;

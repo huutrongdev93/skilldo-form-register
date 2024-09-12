@@ -1,9 +1,9 @@
 <?php
 Class Form_Register extends \SkillDo\Model\Model {
 
-    static string $table = 'generate_form_register';
+    protected string $table = 'generate_form_register';
 
-    static array $columns = [
+    protected array $columns = [
         'name'  => ['string'],
         'key'   => ['string'],
         'field' => ['array', []],
@@ -14,7 +14,7 @@ Class Form_Register extends \SkillDo\Model\Model {
         'send_email' => ['int', 0],
     ];
 
-    static array $rules = [
+    protected array $rules = [
         'add'               => [
             'require' => [
                 'key' => 'Form Key không được để trống'
@@ -25,9 +25,9 @@ Class Form_Register extends \SkillDo\Model\Model {
 
 class Form_Register_Result extends \SkillDo\Model\Model
 {
-    static string $table = 'form_register_result';
+    protected string $table = 'form_register_result';
 
-    static array $columns = [
+    protected array $columns = [
         'name' => ['string'],
         'email' => ['string'],
         'phone' => ['string'],
@@ -36,9 +36,7 @@ class Form_Register_Result extends \SkillDo\Model\Model
         'form_key' => ['string'],
     ];
 
-    static array $rules = [
-        'created'           => true,
-        'updated'           => true,
+    protected array $rules = [
         'add'               => [
             'require' => [
                 'form_key' => 'Form Key không được để trống'
