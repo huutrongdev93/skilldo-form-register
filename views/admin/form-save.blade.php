@@ -140,6 +140,20 @@
 
 			let data = $(this).serializeJSON();
 
+            let temp = {};
+
+            $(this).find('textarea.tinymce, textarea.tinymce-shortcut').each(function(index, el) {
+                let textareaId 	= $(this).attr('id');
+                temp[$(this).attr('name')] = tinymce.get(textareaId).getContent();
+            });
+
+            if(Object.keys(temp).length > 0) {
+
+                temp = convertObjectKeyToLevel(temp)
+
+                data = mergeObjects(data, temp)
+            }
+
 			data.action     =  'Form_Register_Ajax::adminSave';
 
 			let load = $(this).find('.loading');

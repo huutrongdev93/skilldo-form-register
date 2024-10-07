@@ -8,7 +8,7 @@ Class Form_Register extends \SkillDo\Model\Model {
         'key'   => ['string'],
         'field' => ['array', []],
         'url_redirect'  => ['string'],
-        'email_template' => ['string'],
+        'email_template' => ['wysiwyg'],
         'is_live'   => ['int', 1],
         'is_redirect' => ['int', 0],
         'send_email' => ['int', 0],
