@@ -45,6 +45,8 @@ Class Form_Register_Ajax {
 
                     $validations = [];
 
+                    $mailsData = [];
+
                     foreach ($fields as $inputTypes) {
 
                         foreach ($inputTypes as $input) {
@@ -87,6 +89,10 @@ Class Form_Register_Ajax {
                         if(is_string($data[$column])) {
                             $data[$column] = Str::clear($data[$column]);
                         }
+
+                        if(!empty($input['use'])) {
+                            $mailsData[$input['field']] = $data[$column];
+                        }
                     }
 
                     foreach ($fields['metadata'] as $column => $input) {
@@ -96,6 +102,8 @@ Class Form_Register_Ajax {
                         if(is_string($metadata[$input['name']])) {
                             $metadata[$input['name']] = Str::clear($metadata[$input['name']]);
                         }
+
+                        $mailsData[$input['field']] = $metadata[$input['name']];
                     }
 
                     $data['status'] 	= 1;
@@ -128,12 +136,12 @@ Class Form_Register_Ajax {
 
                             $data['base_url'] = Url::base();
 
-                            $dataEmail = apply_filters('generate_form_register_'.$form_key.'_email_data',[...$data, ...$metadata], $form);
+                            $mailsData = apply_filters('generate_form_register_'.$form_key.'_email_data', $mailsData, $form);
 
                             Mail::to(Option::get('contact_mail'))
                                 ->subject($subject)
                                 ->replyTo(Option::get('contact_mail'), $name)
-                                ->body($content, $dataEmail)
+                                ->body($content, $mailsData)
                                 ->send();
                         }
 
@@ -148,7 +156,7 @@ Class Form_Register_Ajax {
                             $result['url_redirect'] = $form->url_redirect;
                         }
 
-                        do_action('generate_form_register_success', $form);
+                        do_action('generate_form_register_success', $form, $mailsData);
 
                         response()->success(trans('register.gfr.success'), $result);
                     }
