@@ -25,8 +25,6 @@ class AdminFormRegisterResultButton {
     {
         return $actionList;
     }
-
-
 }
 add_filter('table_form_register_result_header_buttons', 'AdminFormRegisterResultButton::tableHeaderButton');
 add_filter('table_form_register_result_bulk_action_buttons', 'AdminFormRegisterResultButton::bulkAction', 30);

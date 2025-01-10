@@ -12,6 +12,7 @@ return new class () extends Migration {
                 $table->increments('id');
                 $table->tinyInteger('is_live')->default(1);
                 $table->tinyInteger('send_email')->default(0);
+                $table->tinyInteger('send_telegram')->default(0);
                 $table->tinyInteger('is_redirect')->default(0);
                 $table->string('name', 200)->collate('utf8mb4_unicode_ci')->nullable();
                 $table->string('key', 100);

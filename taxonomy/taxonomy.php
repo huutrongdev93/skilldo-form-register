@@ -6,7 +6,7 @@ function form_register_result_{{formKey}}_menu() {
 
 	if(!is_numeric($count)) {
 
-		$count = Form_Register_Result::count(Qr::set('form_key', '{{formKey}}')->where('status', 1));
+		$count = \FormRegister\Model\FormResult::count(Qr::set('form_key', '{{formKey}}')->where('status', 1));
 
 		\SkillDo\Cache::save($cacheId, $count);
 	}

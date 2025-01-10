@@ -13,27 +13,19 @@ Class FormRegisterResultAdmin {
             return;
         }
 
-        $form = Form_Register::where('key', $formKey)->select('name')->first();
+        $form = \FormRegister\Model\Form::where('key', $formKey)->select('name')->first();
 
         if(empty($form)) {
             echo Admin::alert('error', 'Form không tồn tại');
             return;
         }
 
-        $table = new AdminFormRegisterTable([
-            'items' => [],
-            'table' => 'form_register_result',
-            'model' => model('form_register_result'),
-            'module'=> 'form_register_result',
-        ]);
+        $table = new \FormRegister\Table\AdminResult();
 
         Admin::view('components/page-default/page-index', [
             'module'    => 'form_register_result',
             'name'      => $form->name,
             'table'     => $table,
-            'tableId'     => 'admin_table_form_register_result_list',
-            'limitKey'    => 'admin_form_register_result_limit',
-            'ajax'        => 'Form_Register_Ajax::load',
         ]);
     }
     static function breadcrumb($breadcrumb, $pageIndex, \SkillDo\Http\Request $request): array
@@ -70,7 +62,7 @@ Class FormRegisterResultAdmin {
 
                     if(!is_numeric($count) || $count > 0) {
 
-                        Form_Register_Result::where('status', 1)->update(['status' => 0]);
+                        \FormRegister\Model\FormResult::where('status', 1)->update(['status' => 0]);
 
                         \SkillDo\Cache::delete($cacheId);
                     }

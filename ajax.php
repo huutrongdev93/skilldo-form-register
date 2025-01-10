@@ -8,177 +8,217 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 Class Form_Register_Ajax {
     #[NoReturn]
-    static function register(Request $request, $model): void
+    static function register(Request $request): void
     {
-        if($request->isMethod('post')) {
+        $form_key = $request->input('form_key');
 
-            $form_key = $request->input('form_key');
+        $form 	  = \FormRegister\Model\Form::where('key', $form_key)->first();
 
-            $form 	  = Form_Register::where('key', $form_key)->first();
+        $post 	  = $request->input();
 
-            $post 	  = $request->input();
+        unset($post['action']);
 
-            unset($post['action']);
+        if(have_posts($form) && have_posts($post)) {
 
-            if(have_posts($form) && have_posts($post)) {
+            if($form->is_live == 0)
+            {
+                response()->error(trans('register.gfr.off'));
+            }
 
-                if($form->is_live == 0) {
-                    response()->error(trans('register.gfr.off'));
+            $fields = unserialize($form->field);
+
+            if(have_posts($fields)) {
+
+                $errors = '';
+
+                $errors = apply_filters('generate_form_register_'.$form_key.'_error', $errors, $form );
+
+                if(is_skd_error($errors)) {
+
+                    response()->error($errors);
                 }
 
-                $fields = unserialize($form->field);
+                $data 		= [];
 
-                if(have_posts($fields)) {
+                $metadata 	= [];
 
-                    $errors = '';
+                $validations = [];
 
-                    $errors = apply_filters('generate_form_register_'.$form_key.'_error', $errors, $form );
+                $mailsData = [];
 
-                    if(is_skd_error($errors)) {
+                foreach ($fields as $inputTypes)
+                {
+                    foreach ($inputTypes as $input) {
 
-                        response()->error($errors);
+                        if (isset($input['use']) && $input['use'] == 0) continue;
+
+                        $validation = Rule::make($input['label']);
+
+                        if (!empty($input['required'])) {
+                            $validation->notEmpty();
+                        }
+
+                        if (!empty($input['isEmail'])) {
+                            $validation->email();
+                        }
+
+                        if (!empty($input['isPhone'])) {
+                            $validation->phone();
+                        }
+
+                        if (!empty($validation->validators())) {
+                            $validations[$input['field']] = $validation;
+                        }
+                    }
+                }
+
+                if(!empty($validations))
+                {
+                    $validate = $request->validate($validations)->validate();
+
+                    if ($validate->fails()) {
+                        response()->error($validate->errors());
+                    }
+                }
+
+                foreach ($fields['default'] as $column => $input)
+                {
+                    $data[$column] = $request->input($input['field']);
+
+                    if(is_string($data[$column])) {
+                        $data[$column] = Str::clear($data[$column]);
                     }
 
-                    $data 		= [];
+                    if(!empty($input['use'])) {
+                        $mailsData[$input['field']] = $data[$column];
+                    }
+                }
 
-                    $metadata 	= [];
+                foreach ($fields['metadata'] as $column => $input)
+                {
+                    $metadata[$input['name']] = $request->input($input['field']);
 
-                    $validations = [];
+                    if(is_string($metadata[$input['name']])) {
+                        $metadata[$input['name']] = Str::clear($metadata[$input['name']]);
+                    }
 
-                    $mailsData = [];
+                    $mailsData[$input['field']] = $metadata[$input['name']];
+                }
 
-                    foreach ($fields as $inputTypes) {
+                $data['status'] 	= 1;
 
-                        foreach ($inputTypes as $input) {
+                $data['form_key'] = $form->key;
 
-                            if (isset($input['use']) && $input['use'] == 0) continue;
+                $data = apply_filters('generate_form_register_'.$form_key.'_data', $data, $form);
 
-                            $validation = Rule::make($input['label']);
+                $res  = \FormRegister\Model\FormResult::insert($data);
 
-                            if (!empty($input['required'])) {
-                                $validation->notEmpty();
+                if(!is_skd_error($res)) {
+
+                    \SkillDo\Cache::delete('generate_form_count_'.$form->key);
+
+                    if(have_posts($metadata))
+                    {
+                        foreach ($metadata as $meta_key => $meta_value)
+                        {
+                            \FormRegister\Model\FormResult::updateMeta($res, $meta_key, $meta_value);
+                        }
+                    }
+
+                    if($form->send_email == 1)
+                    {
+                        $subject = 'Có email được gửi từ form '.$form->name.' vào '.date('d/m/Y H:i');
+
+                        $name = (isset($data['name'])) ? $data['name'] : 'No name';
+
+                        $content = file_get_contents(FCPATH.Path::plugin('generate-form-register').'/views/email/template-1.php');
+
+                        $content = str_replace('{{email_template}}', $form->email_template, $content);
+
+                        $data['base_url'] = Url::base();
+
+                        $mailsData = apply_filters('generate_form_register_'.$form_key.'_email_data', $mailsData, $form);
+
+                        Mail::to(Option::get('contact_mail'))
+                            ->subject($subject)
+                            ->replyTo(Option::get('contact_mail'), $name)
+                            ->body($content, $mailsData)
+                            ->send();
+                    }
+
+                    if($form->send_telegram == 1 && Plugin::isActive('telegram'))
+                    {
+                        defer(function () use ($request, $form) {
+
+                            $message = ":::📝 ".$form->name.":\n";
+
+                            $message .= "Ngày: ".date('d-m-Y H:i')."\n";
+
+                            $message .= "-------------------\n";
+
+                            $fields = unserialize($form->field);
+
+                            foreach ($fields['default'] as $column => $input)
+                            {
+                                if(!empty($input['use']))
+                                {
+                                    $message .= $input['label'].": {$request->input($input['field'])}\n";
+                                }
                             }
 
-                            if (!empty($input['isEmail'])) {
-                                $validation->email();
+                            foreach ($fields['metadata'] as $column => $input)
+                            {
+                                $message .= $input['label'].": {$request->input($input['field'])}\n";
                             }
 
-                            if (!empty($input['isPhone'])) {
-                                $validation->phone();
-                            }
+                            $message .= "-------------------\n";
 
-                            if (!empty($validation->validators())) {
-                                $validations[$input['field']] = $validation;
-                            }
-                        }
+                            $message .= "Thông tin được gửi từ website ".Url::base()."\n";
+
+                            \SkillDo\Telegram\Notification::make()->message($message)->send();
+
+                        }, 'telegram_form_register_created');
                     }
 
-                    if(!empty($validations)) {
+                    $result['data'] 	    = [];
 
-                        $validate = $request->validate($validations)->validate();
+                    $result['is_redirect'] 	= false;
 
-                        if ($validate->fails()) {
-                            response()->error($validate->errors());
-                        }
+                    if($form->is_redirect == 1 && !empty($form->url_redirect)) {
+
+                        $result['is_redirect'] 	= true;
+
+                        $result['url_redirect'] = $form->url_redirect;
                     }
 
-                    foreach ($fields['default'] as $column => $input) {
+                    do_action('generate_form_register_success', $form, $mailsData);
 
-                        $data[$column] = $request->input($input['field']);
-
-                        if(is_string($data[$column])) {
-                            $data[$column] = Str::clear($data[$column]);
-                        }
-
-                        if(!empty($input['use'])) {
-                            $mailsData[$input['field']] = $data[$column];
-                        }
-                    }
-
-                    foreach ($fields['metadata'] as $column => $input) {
-
-                        $metadata[$input['name']] = $request->input($input['field']);
-
-                        if(is_string($metadata[$input['name']])) {
-                            $metadata[$input['name']] = Str::clear($metadata[$input['name']]);
-                        }
-
-                        $mailsData[$input['field']] = $metadata[$input['name']];
-                    }
-
-                    $data['status'] 	= 1;
-
-                    $data['form_key'] = $form->key;
-
-                    $data = apply_filters('generate_form_register_'.$form_key.'_data', $data, $form);
-
-                    $res  = Form_Register_Result::insert($data);
-
-                    if(!is_skd_error($res)) {
-
-                        \SkillDo\Cache::delete('generate_form_count_'.$form->key);
-
-                        if(have_posts($metadata)) {
-                            foreach ($metadata as $meta_key => $meta_value) {
-                                Form_Register_Result::updateMeta($res, $meta_key, $meta_value);
-                            }
-                        }
-
-                        if($form->send_email == 1) {
-
-                            $subject = 'Có email được gửi từ form '.$form->name.' vào '.date('d/m/Y H:i');
-
-                            $name = (isset($data['name'])) ? $data['name'] : 'No name';
-
-                            $content = file_get_contents(FCPATH.Path::plugin('generate-form-register').'/views/email/template-1.php');
-
-                            $content = str_replace('{{email_template}}', $form->email_template, $content);
-
-                            $data['base_url'] = Url::base();
-
-                            $mailsData = apply_filters('generate_form_register_'.$form_key.'_email_data', $mailsData, $form);
-
-                            Mail::to(Option::get('contact_mail'))
-                                ->subject($subject)
-                                ->replyTo(Option::get('contact_mail'), $name)
-                                ->body($content, $mailsData)
-                                ->send();
-                        }
-
-                        $result['data'] 	    = [];
-
-                        $result['is_redirect'] 	= false;
-
-                        if($form->is_redirect == 1 && !empty($form->url_redirect)) {
-
-                            $result['is_redirect'] 	= true;
-
-                            $result['url_redirect'] = $form->url_redirect;
-                        }
-
-                        do_action('generate_form_register_success', $form, $mailsData);
-
-                        response()->success(trans('register.gfr.success'), $result);
-                    }
+                    response()->success(trans('register.gfr.success'), $result);
                 }
             }
         }
-
-        response()->error(trans('register.gfr.fail'));
     }
 
     #[NoReturn]
-    static function adminSave(Request $request, $model): void
+    static function adminSave(Request $request): void
     {
         if($request->isMethod('post')) {
+
+            $validate = $request->validate([
+                'key' => Rule::make('Key form')->notEmpty(),
+                'fieldName' => Rule::make('Cấu hình cho trường name')->notEmpty(),
+                'fieldEmail' => Rule::make('Cấu hình cho trường email')->notEmpty(),
+                'fieldPhone' => Rule::make('Cấu hình cho trường phone')->notEmpty(),
+                'fieldMessage' => Rule::make('Cấu hình cho trường message')->notEmpty(),
+            ]);
+
+            if ($validate->fails()) {
+                response()->error($validate->errors());
+            }
 
             $key = $request->input('key');
 
             $id  = $request->input('id');
-
-            if(empty($key)) {
-                response()->error('Key form không được để trống');
-            }
 
             $data = $request->input();
 
@@ -191,19 +231,6 @@ Class Form_Register_Ajax {
                 'default' => [],
                 'metadata' => []
             ];
-
-            if(empty($data['fieldName'])) {
-                response()->error('Cấu hình cho trường name chưa có');
-            }
-            if(empty($data['fieldEmail'])) {
-                response()->error('Cấu hình cho trường email chưa có');
-            }
-            if(empty($data['fieldPhone'])) {
-                response()->error('Cấu hình cho trường phone chưa có');
-            }
-            if(empty($data['fieldMessage'])) {
-                response()->error('Cấu hình cho trường message chưa có');
-            }
 
             $field['default']['name'] = $data['fieldName'];
 
@@ -231,8 +258,8 @@ Class Form_Register_Ajax {
             //Thêm mới
             if(empty($id)) {
 
-                if(Form_Register::count(Qr::set('key', $key)) != 0) {
-
+                if(\FormRegister\Model\Form::where('key', $key)->count() != 0)
+                {
                     response()->error('Key form đã tồn tại');
                 }
 
@@ -240,9 +267,10 @@ Class Form_Register_Ajax {
 
                 if(!isset($data['is_live'])) $data['is_live'] = 1;
 
-                $error = Form_Register::insert($data);
+                $error = \FormRegister\Model\Form::insert($data);
 
-                if(is_skd_error($error)) {
+                if(is_skd_error($error))
+                {
                     response()->error($error);
                 }
 
@@ -253,9 +281,10 @@ Class Form_Register_Ajax {
             //Cập nhật
             else {
 
-                $form   = Form_Register::get($id);
+                $form   = \FormRegister\Model\Form::get($id);
 
-                if(!have_posts($form)) {
+                if(!have_posts($form))
+                {
                     response()->error(trans('Form không tồn tại'));
                 }
 
@@ -281,9 +310,11 @@ Class Form_Register_Ajax {
 
                 if(!isset($form_data['send_email'])) $form_data['send_email'] = 0;
 
+                if(!isset($form_data['send_telegram']) && Plugin::isActive('telegram')) $form_data['send_telegram'] = 0;
+
                 if(!isset($form_data['is_redirect'])) $form_data['is_redirect'] = 0;
 
-                $error = Form_Register::insert($form_data);
+                $error = \FormRegister\Model\Form::insert($form_data);
 
                 if(is_skd_error($error)) {
                     response()->error($error);
@@ -358,7 +389,7 @@ Class Form_Register_Ajax {
 
             $data['field'] = $field;
 
-            if(Form_Register::count(Qr::set('key', $key)) != 0) {
+            if(\FormRegister\Model\Form::count(Qr::set('key', $key)) != 0) {
 
                 response()->error('Key form đã tồn tại');
             }
@@ -367,7 +398,7 @@ Class Form_Register_Ajax {
 
             if(!isset($data['is_live'])) $data['is_live'] = 1;
 
-            $error = Form_Register::insert($data);
+            $error = \FormRegister\Model\Form::insert($data);
 
             if(is_skd_error($error)) {
                 response()->error($error);
@@ -379,98 +410,6 @@ Class Form_Register_Ajax {
         }
 
         response()->error(trans('ajax.update.error'));
-    }
-
-    #[NoReturn]
-    static function load(Request $request): void
-    {
-        if($request->isMethod('post')) {
-
-            $page    = $request->input('page');
-
-            $page   = (is_null($page) || empty($page)) ? 1 : (int)$page;
-
-            $limit  = $request->input('limit');
-
-            $limit   = (is_null($limit) || empty($limit)) ? 10 : (int)$limit;
-
-            $formKey = $request->input('form-key');
-
-            $recordsTotal   = $request->input('recordsTotal');
-
-            $args = Qr::set('form_key', $formKey);
-
-            $time = Str::clear($request->input('time'));
-
-            if(!empty($time)) {
-                $time = explode(' - ', $time);
-                if(have_posts($time) && count($time) == 2) {
-                    $time[0] = str_replace('/', '-', $time[0]);
-                    $time[1] = str_replace('/', '-', $time[1]);
-                    $timeStart = date('Y-m-d', strtotime($time[0])).' 00:00:00';
-                    $timeEnd   = date('Y-m-d', strtotime($time[1])).' 23:59:59';
-                    $args->where('created', '>=', $timeStart);
-                    $args->where('created', '<=', $timeEnd);
-                }
-            }
-
-            /**
-             * @since 7.0.0
-             */
-            $args = apply_filters('admin_form_register_result_controllers_index_args_before_count', $args);
-
-            if(!is_numeric($recordsTotal)) {
-                $recordsTotal = apply_filters('admin_form_register_result_controllers_index_count', Form_Register_Result::count($args), $args);
-            }
-
-
-            # [List data]
-            $args->limit($limit)
-                ->offset(($page - 1)*$limit)
-                ->orderBy('created', 'desc');
-
-            $args = apply_filters('admin_form_register_result_controllers_index_args', $args);
-
-            $objects = apply_filters('admin_form_register_result_controllers_index_objects', Form_Register_Result::gets($args), $args);
-
-            $args = [
-                'items' => $objects,
-                'table' => 'form_register_result',
-                'model' => model('form_register_result'),
-                'module'=> 'form_register_result',
-            ];
-
-            $table = new AdminFormRegisterTable($args);
-            $table->get_columns();
-            ob_start();
-            $table->display_rows_or_message();
-            $html = ob_get_contents();
-            ob_end_clean();
-
-            /**
-             * Bulk Actions
-             * @hook table_*_bulk_action_buttons Hook mới phiên bản 7.0.0
-             */
-            $buttonsBulkAction = apply_filters('table_form_register_result_bulk_action_buttons', []);
-
-            $bulkAction = Admin::partial('include/table/header/bulk-action-buttons', [
-                'actionList' => $buttonsBulkAction
-            ]);
-
-            $result['data'] = [
-                'html'          => base64_encode($html),
-                'bulkAction'    => base64_encode($bulkAction),
-            ];
-            $result['pagination']   = [
-                'limit' => $limit,
-                'total' => $recordsTotal,
-                'page'  => (int)$page,
-            ];
-
-            response()->success(trans('ajax.load.success'), $result);
-        }
-
-        response()->error(trans('ajax.load.error'));
     }
 
     #[NoReturn]
@@ -530,9 +469,9 @@ Class Form_Register_Ajax {
                 $args = apply_filters('admin_form_register_result_controllers_index_args_count', $args);
             }
 
-            $formResults = Form_Register_Result::gets($args);
+            $formResults = \FormRegister\Model\FormResult::gets($args);
 
-            $form = Form_Register::where('key', $formKey)->first();
+            $form = \FormRegister\Model\Form::where('key', $formKey)->first();
 
             $fields = unserialize($form->field);
 
@@ -590,7 +529,7 @@ Class Form_Register_Ajax {
                 $headerSheet[$input['name']] = [
                     'label' => $input['label'],
                     'value' => function($item) use ($input) {
-                        return Form_Register_Result::getMeta($item->id, $input['name'], true);
+                        return \FormRegister\Model\FormResult::getMeta($item->id, $input['name'], true);
                     }
                 ];
             }
@@ -703,7 +642,6 @@ Class Form_Register_Ajax {
 Ajax::client('Form_Register_Ajax::register');
 Ajax::admin('Form_Register_Ajax::adminSave');
 Ajax::admin('Form_Register_Ajax::quickCreate');
-Ajax::admin('Form_Register_Ajax::load');
 Ajax::admin('Form_Register_Ajax::export');
 
 #[NoReturn]

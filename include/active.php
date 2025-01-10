@@ -51,8 +51,8 @@ Class Form_Register_Active {
         ];
 
         foreach ($forms_default as $key => $form) {
-            if(Form_Register::count(Qr::set('key', $form['key'])) == 0) {
-                Form_Register::insert($form);
+            if(\FormRegister\Model\Form::count(Qr::where('key', $form['key'])) == 0) {
+                \FormRegister\Model\Form::insert($form);
             }
         }
     }

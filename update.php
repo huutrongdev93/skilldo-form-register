@@ -20,7 +20,7 @@ add_action('admin_init', 'GenerateFormRegisterUpdateCore');
 Class GenerateFormRegisterUpdateVersion {
     public function runUpdate($versionCurrent): void
     {
-        $listVersion    = ['4.0.0'];
+        $listVersion    = ['4.0.0', '4.1.0'];
 
         foreach ($listVersion as $version ) {
             if(version_compare( $version, $versionCurrent ) == 1) {
@@ -36,6 +36,13 @@ Class GenerateFormRegisterUpdateVersion {
         GenerateFormRegisterUpdateDatabase::Version_4_0_0();
         GenerateFormRegisterUpdateFiles::Version_4_0_0();
     }
+
+    public function update_Version_4_1_0(): void
+    {
+        GenerateFormRegisterUpdateDatabase::Version_4_1_0();
+        GenerateFormRegisterUpdateFiles::Version_4_1_0();
+        Form_Register_Helper::build();
+    }
 }
 
 Class GenerateFormRegisterUpdateDatabase {
@@ -43,7 +50,7 @@ Class GenerateFormRegisterUpdateDatabase {
     {
         (include 'database/db_v4.0.0.php')->up();
 
-        $forms = Form_Register::gets();
+        $forms = \FormRegister\Model\Form::gets();
 
         foreach ($forms as $form) {
 
@@ -253,11 +260,11 @@ Class GenerateFormRegisterUpdateDatabase {
                 if(!empty($id)) {
 
                     foreach ($field['metadata'] as $fieldName => $meta) {
-                        Form_Register_Result::updateMeta($id, $fieldName, Posts::getMeta($post_id, $fieldName, true));
+                        \FormRegister\Model\FormResult::updateMeta($id, $fieldName, Posts::getMeta($post_id, $fieldName, true));
                     }
 
                     foreach ($fieldMetaSpecial as $fieldName => $meta) {
-                        Form_Register_Result::updateMeta($id, $meta['field'], $meta['value']);
+                        \FormRegister\Model\FormResult::updateMeta($id, $meta['field'], $meta['value']);
                     }
                 }
             }
@@ -274,12 +281,17 @@ Class GenerateFormRegisterUpdateDatabase {
                 }
             }
 
-            Form_Register::where('id', $form->id)->update([
+            \FormRegister\Model\Form::where('id', $form->id)->update([
                 'field' => serialize($field)
             ]);
 
             Form_Register_Helper::build();
         }
+    }
+
+    public static function Version_4_1_0(): void
+    {
+        (include 'database/db_v4.1.0.php')->up();
     }
 }
 
@@ -290,5 +302,13 @@ Class GenerateFormRegisterUpdateFiles {
         $storage = Storage::disk('plugin');
         $storage->deleteDirectory('generate-form-register/admin/html');
         $storage->deleteDirectory('generate-form-register/email-template');
+    }
+
+    public static function Version_4_1_0(): void
+    {
+        $storage = Storage::disk('plugin');
+        $storage->delete('generate-form-register/generate-form-register-function.php');
+        $storage->delete('generate-form-register/generate-form-register-ajax.php');
+        $storage->delete('generate-form-register/views/admin/form-list.blade.php');
     }
 }

@@ -1,50 +1,5 @@
 <?php
-Class Form_Register extends \SkillDo\Model\Model {
-
-    protected string $table = 'generate_form_register';
-
-    protected array $columns = [
-        'name'  => ['string'],
-        'key'   => ['string'],
-        'field' => ['array', []],
-        'url_redirect'  => ['string'],
-        'email_template' => ['wysiwyg'],
-        'is_live'   => ['int', 1],
-        'is_redirect' => ['int', 0],
-        'send_email' => ['int', 0],
-    ];
-
-    protected array $rules = [
-        'add'               => [
-            'require' => [
-                'key' => 'Form Key không được để trống'
-            ]
-        ],
-    ];
-}
-
-class Form_Register_Result extends \SkillDo\Model\Model
-{
-    protected string $table = 'form_register_result';
-
-    protected array $columns = [
-        'name' => ['string'],
-        'email' => ['string'],
-        'phone' => ['string'],
-        'message' => ['string'],
-        'status' => ['int', 0],
-        'form_key' => ['string'],
-    ];
-
-    protected array $rules = [
-        'add'               => [
-            'require' => [
-                'form_key' => 'Form Key không được để trống'
-            ]
-        ],
-    ];
-}
-
+class Form_Register extends \FormRegister\Model\Form {}
 Class Form_Register_Helper {
     static function config($field = '', $type = ''): array
     {
@@ -132,7 +87,7 @@ Class Form_Register_Helper {
             $storage->delete('taxonomy.build.php');
         }
 
-        $forms = Form_Register::gets();
+        $forms = \FormRegister\Model\Form::gets();
 
         $codeMain = '<?php'."\n";
 

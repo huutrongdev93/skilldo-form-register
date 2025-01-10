@@ -1,5 +1,5 @@
 <?php
-const G_FORM_REGISTER_VERSION = '4.0.1';
+const G_FORM_REGISTER_VERSION = '4.1.0';
 
 class generate_form_register {
 
@@ -25,17 +25,13 @@ class generate_form_register {
     }
 }
 new generate_form_register();
-/* xử lý quản lý admin */
-include 'update.php';
-include 'include/active.php';
-include 'generate-form-register-function.php';
-include 'generate-form-register-ajax.php';
-/* xử lý quản lý admin */
-if(Admin::is()) {
-    include 'admin/generate-form-register-roles.php';
-    include 'admin/generate-form-register.php';
-    include 'admin/form-register-result.php';
-	if(file_exists('views/plugins/generate-form-register/taxonomy/taxonomy.build.php')) {
+
+include 'autoload/autoload.php';
+
+if(Admin::is())
+{
+	if(file_exists('views/plugins/generate-form-register/taxonomy/taxonomy.build.php'))
+    {
         include 'taxonomy/taxonomy.build.php';
 	}
 }

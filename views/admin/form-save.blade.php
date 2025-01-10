@@ -61,6 +61,20 @@
                             </div>
                         </div>
 
+                        @if(\Plugin::isActive('telegram'))
+                        <div class="row" style="margin-bottom:10px;">
+                            <div class="col-md-3">
+                                <label for="">Gửi Telegram</label>
+                                <p style="font-size:13px; color:#999;">Gửi thông báo đến telegram khi có người đăng ký form này</p>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="form-check">
+                                    <input type="checkbox" name="send_telegram" id="send_telegram" class="form-check-input" value="1" {!! (isset($form) && $form->send_telegram == 1) ? 'checked' : '' !!}>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
                         <div class="row" style="margin-bottom:10px;">
                             <div class="col-md-3">
                                 <label for="">Chuyển hướng sau khi submit</label>

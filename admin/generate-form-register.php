@@ -19,20 +19,28 @@ class GenerateFormRegisterAdmin {
 
         if(empty($view)) $view = 'list';
 
-        Plugin::view('generate-form-register', 'views/admin/form-tabs', ['view' => $view]);
-
-        $data = [];
-
         if($view == 'list') {
-            $data['forms'] = Form_Register::gets();
-            Plugin::view('generate-form-register', 'views/admin/form-list', $data);
+
+            $table = new \FormRegister\Table\AdminForm();
+
+            Admin::view('components/page-default/page-index', [
+                'module'    => 'form_register',
+                'name'      => 'Danh sách Form',
+                'table'     => $table,
+            ]);
+
+            //Plugin::view('generate-form-register', 'views/admin/form-list', $data);
         }
 
-        if($view == 'add' || $view == 'edit') {
+        if($view == 'add' || $view == 'edit')
+        {
+            Plugin::view('generate-form-register', 'views/admin/form-tabs', ['view' => $view]);
             GenerateFormRegisterAdmin::pageSave($request);
         }
 
-        if($view == 'sample') {
+        if($view == 'sample')
+        {
+            Plugin::view('generate-form-register', 'views/admin/form-tabs', ['view' => $view]);
 
             $dataFormSample = [
                 (object)[
@@ -195,7 +203,7 @@ class GenerateFormRegisterAdmin {
 
 		if(!empty($id)) {
 
-            $form = Form_Register::get($id);
+            $form = \FormRegister\Model\Form::get($id);
 
 			if(!have_posts($form)) {
 				echo Admin::alert('error', 'Không tìm thấy form có id là '. $id);
