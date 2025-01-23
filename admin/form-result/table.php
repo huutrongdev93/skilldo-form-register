@@ -61,7 +61,7 @@ class AdminResult extends SKDObjectTable {
 
         $listButton['delete'] = \Admin::btnDelete([
             'id' => $item->id,
-            'model' => $module,
+            'model' => $this->model,
         ]);
 
         return $listButton;
