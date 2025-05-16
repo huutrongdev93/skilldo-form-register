@@ -10,7 +10,7 @@
                     <a class="nav-link" href="#form" aria-bs-controls="form" role="tab" data-bs-toggle="tab">FORM</a>
                 </li>
                 <li role="presentation" class="nav-item">
-                    <a class="nav-link" href="#email_template" aria-bs-controls="email_template" role="tab" data-bs-toggle="tab">Email Template</a>
+                    <a class="nav-link" href="#email-template-tab" aria-bs-controls="email-template-tab" role="tab" data-bs-toggle="tab">Email Template</a>
                 </li>
             </ul>
         </div>
@@ -120,13 +120,12 @@
             </div>
             <!-- /BASE -->
 
-            <div role="tabpanel" class="tab-pane" id="email_template">
+            <div role="tabpanel" class="tab-pane" id="email-template-tab">
                 <div class="box">
                     <div class="box-content" style="padding:15px;">
                         <div class="row" style="margin-bottom:10px;">
                             <div class="col-md-12">
-                                <p>Biến thay thế dạng {{$email}}</p>
-                                {!! \SkillDo\Form\Form::render(['field' => 'email_template', 'type' => 'wysiwyg', 'after' => '<div>', 'before' => '</div>'],(isset($form)) ? $form->email_template : '') !!}
+                                {!! \SkillDo\Form\Form::render(['field' => 'email_template', 'type' => 'wysiwyg', 'start' => '<div>', 'end' => '</div>'],(isset($form)) ? $form->email_template : '') !!}
                             </div>
                         </div>
                     </div>
