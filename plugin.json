@@ -1,0 +1,14 @@
+{
+    "name":"Generate Form Register",
+    "class":"GenerateFormRegister",
+    "url":"https://sikido.vn",
+    "description":"Trình xây dựng form đăng ký",
+    "author":"Nguyễn Hữu Trọng",
+    "version":"5.0.3",
+    "autoload": {
+        "alias": "FormRegister",
+        "psr-4": {
+            "FormRegister\\Builds" : "app\\Builds"
+        }
+    }
+}

@@ -1,0 +1,188 @@
+{!! Admin::partial('resources/components/breadcrumb') !!}
+{!! view('generate-form-register::admin/form-tabs') !!}
+<form method="post" id="system_form">
+    {!! Admin::loading() !!}
+    <div class="col-md-12">
+        <div role="tabpanel">
+            <ul class="nav nav-tabs nav-tabs-horizontal mb-3" role="tablist">
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link active" href="#base" aria-bs-controls="base" role="tab" data-bs-toggle="tab">CƠ BẢN</a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link" href="#form" aria-bs-controls="form" role="tab" data-bs-toggle="tab">FORM</a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link" href="#email-template-tab" aria-bs-controls="email-template-tab" role="tab" data-bs-toggle="tab">Email Template</a>
+                </li>
+            </ul>
+        </div>
+        @if(isset($form))
+            <input type="hidden" name="id" value="{!! $form->id !!}">
+        @endif
+        <div class="tab-content">
+            <!-- BASE -->
+            <div role="tabpanel" class="tab-pane active" id="base">
+                <div class="box">
+                    <div class="box-content" style="padding:15px;">
+
+                        <div class="row" style="margin-bottom:10px;">
+                            <div class="col-md-3"><label for="">Tên form</label></div>
+                            <div class="col-md-9">
+                                {!! \SkillDo\Cms\Form\Form::text('name', ['start' => '<div>', 'end' => '</div>'], (isset($form)) ? $form->name :'')->render() !!}
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-bottom:10px;">
+                            <div class="col-md-3"><label for="">Key form</label></div>
+                            <div class="col-md-9">
+                                {!! \SkillDo\Cms\Form\Form::text('key', ['start' => '<div>', 'end' => '</div>'], (isset($form)) ? $form->key : '')->render() !!}
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-bottom:10px;">
+                            <div class="col-md-3">
+                                <label for="">Bật/Tắt form</label>
+                                <p style="font-size:13px;color:#999;">Cho phép khách hàng đăng ký sử dụng form</p>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="form-check">
+                                    <input type="checkbox" name="is_live" id="is_live" class="form-check-input" value="1" {!! (isset($form) && $form->is_live == 1) ? 'checked' : '' !!}>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-bottom:10px;">
+                            <div class="col-md-3">
+                                <label for="">Gửi email</label>
+                                <p style="font-size:13px; color:#999;">Bạn cần cấu hình email template để gửi được email theo ý muốn</p>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="form-check">
+                                    <input type="checkbox" name="send_email" id="send_email" class="form-check-input" value="1" {!! (isset($form) && $form->send_email == 1) ? 'checked' : '' !!}>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if(\Plugin::isActive('telegram'))
+                        <div class="row" style="margin-bottom:10px;">
+                            <div class="col-md-3">
+                                <label for="">Gửi Telegram</label>
+                                <p style="font-size:13px; color:#999;">Gửi thông báo đến telegram khi có người đăng ký form này</p>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="form-check">
+                                    <input type="checkbox" name="send_telegram" id="send_telegram" class="form-check-input" value="1" {!! (isset($form) && $form->send_telegram == 1) ? 'checked' : '' !!}>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        <div class="row" style="margin-bottom:10px;">
+                            <div class="col-md-3">
+                                <label for="">Chuyển hướng sau khi submit</label>
+                                <p style="font-size:13px; color:#999;">Sau khi đăng ký thành công trang sẽ được chuyển hướng đi</p>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="form-check">
+                                    <input type="checkbox" name="is_redirect" id="is_redirect" class="form-check-input" value="1" {!! (isset($form) && $form->is_redirect == 1) ? 'checked' : '' !!}>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-bottom:10px;">
+                            <div class="col-md-3"><label for="">Liên kết chuyển hướng</label></div>
+                            <div class="col-md-9">
+                                {!! \SkillDo\Cms\Form\Form::text('url_redirect', ['start' => '<div>', 'end' => '</div>'], (isset($form)) ? $form->url_redirect : '')->render() !!}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /BASE -->
+
+            <!-- BASE -->
+            <div role="tabpanel" class="tab-pane" id="form">
+                <div class="box mb-2">
+                    <div class="box-header"><h4 class="box-title">Trường mặc định</h4></div>
+                    <div class="box-content">
+                        <div class="row">
+                            {!! $formDefault->html() !!}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="box-header"><h4 class="box-title">Trường tùy biến</h4></div>
+                    <div class="box-content">
+                        <div class="row">
+                            {!! $formMeta->html() !!}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /BASE -->
+
+            <div role="tabpanel" class="tab-pane" id="email-template-tab">
+                <div class="box">
+                    <div class="box-content" style="padding:15px;">
+                        <div class="row" style="margin-bottom:10px;">
+                            <div class="col-md-12">
+                                {!! \SkillDo\Cms\Form\Form::wysiwyg('email_template', ['start' => '<div>', 'end' => '</div>'],(isset($form)) ? $form->email_template : '')->render() !!}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<style>
+    .nav-tabs > li {
+        padding:0;
+    }
+    .nav-tabs > li > a {
+        padding:10px;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+</style>
+
+<script defer>
+	$(function(){
+
+		$('#system_form').submit(function() {
+
+			let data = $(this).serializeJSON();
+
+            let temp = {};
+
+            $(this).find('textarea.tinymce, textarea.tinymce-shortcut').each(function(index, el) {
+                let textareaId 	= $(this).attr('id');
+                temp[$(this).attr('name')] = tinymce.get(textareaId).getContent();
+            });
+
+            if(Object.keys(temp).length > 0) {
+
+                temp = convertObjectKeyToLevel(temp)
+
+                data = mergeObjects(data, temp)
+            }
+
+			data.action     =  'FormRegister\\Ajax\\Admin\\FormRegisterAjax::adminSave';
+
+			let load = $(this).find('.loading');
+
+			load.show();
+
+			request.post(ajax, data).then(function(response) {
+
+				load.hide();
+
+				SkilldoMessage.response(response);
+			});
+
+			return false;
+		});
+	})
+</script>
