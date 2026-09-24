@@ -77,7 +77,7 @@
                     });
 
                     if(data.listData.length === 0) {
-                        SkilldoMessage.error(lang.get('export.error.noData'));
+                        SkilldoMessage.error(lang.get('generate-form-register.export.error.noData'));
                         return false;
                     }
                 }
@@ -89,13 +89,13 @@
                     $('.select:checked').each(function () { data.listData[i++] = $(this).val(); });
 
                     if(data.listData.length === 0) {
-                        SkilldoMessage.error(lang.get('export.error.noChoose'));
+                        SkilldoMessage.error(lang.get('generate-form-register.export.error.noChoose'));
                         return false;
                     }
                 }
 
                 if(typeof data == "undefined") {
-                    SkilldoMessage.error(lang.get('export.error.type.illegal'));
+                    SkilldoMessage.error(lang.get('generate-form-register.export.error.type.illegal'));
                     return false;
                 }
 
