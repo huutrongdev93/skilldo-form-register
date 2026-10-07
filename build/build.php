@@ -8,6 +8,8 @@ class FORM_KEY_CLASS_NAMEBuild
 {
     static function adminNavigation(): void
     {
+        if(!\SkillDo\Support\Auth::hasCap('view_email_register')) return;
+
         $count =  (int)Cache::remember('generate_form_count_FORM_KEY', config('cms.cache_time.default'), function()
         {
             return \FormRegister\Models\FormRegisterResult::where('form_key', 'FORM_KEY')->where('status', 1)->count();

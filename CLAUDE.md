@@ -6,7 +6,7 @@ file nào trong plugin.
 Nơi **mọi form của site** đổ dữ liệu về. Không tự dựng bảng lưu form mới — kiểm plugin này trước.
 
 - Class chính `GenerateFormRegister` (`index.php`), namespace `FormRegister\*`, alias `FormRegister`.
-- Version 5.0.5.
+- Version 5.0.7. 5.0.6: sửa `FormRegisterRoleService` sai namespace (làm sập /admin/system/role). 5.0.7: menu Marketing chỉ hiện khi có `view_email_register`; trang admin chặn theo quyền qua filter `role_editor_admin_route_caps` của user-role-editor; `build()` dùng khoá form GỐC (`tu-van-setup`) thay vì đổi `-` → `_` — trước đó link menu kết quả trỏ `form-key=tu_van_setup` nên trang kết quả 404 với mọi tài khoản và số đếm luôn 0.
 
 ## Bảng dữ liệu
 

@@ -52,7 +52,7 @@ class FormRegisterHelper
 
         $taxonomyString = Str::of($taxonomyString)
                                 ->replace('FORM_KEY_CLASS_NAME', Str::studly($form->key))
-                                ->replace('FORM_KEY', str_replace('-', '_', $form->key))
+                                ->replace('FORM_KEY', $form->key)
                                 ->replace('FORM_NAME', $form->name);
 
         $columnsNew = '';
@@ -106,7 +106,7 @@ class FormRegisterHelper
 
                 $bootstraps .= Str::of($storage->get('generate-form-register/build/hooks.php'))
                     ->replace('FORM_KEY_CLASS_NAME', $className)
-                    ->replace('FORM_KEY', str_replace('-', '_', $form->key))
+                    ->replace('FORM_KEY', $form->key)
                     ->toString()."\n";
 
                 $storage->put('generate-form-register/app/Builds/'.$className.'Build.php', static::generateCode($form));

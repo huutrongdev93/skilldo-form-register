@@ -2,7 +2,7 @@
 
 use FormRegister\Modules\Admin\Setting\FormRegisterSystem;
 use FormRegister\Services\FormRegisterAdminService;
-use GenerateFormRegister\Services\FormRegisterRoleService;
+use FormRegister\Services\FormRegisterRoleService;
 
 add_action('theme_custom_assets', [FormRegisterAdminService::class, 'web'], 20, 2);
 
@@ -15,3 +15,4 @@ add_filter('admin_system_tabs', [FormRegisterSystem::class, 'register']);
 
 add_filter( 'user_role_editor_group', [FormRegisterRoleService::class, 'group']);
 add_filter( 'user_role_editor_label', [FormRegisterRoleService::class, 'label']);
+add_filter( 'role_editor_admin_route_caps', [FormRegisterRoleService::class, 'routeCaps']);

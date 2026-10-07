@@ -1,9 +1,9 @@
 <?php
-namespace GenerateFormRegister\Services;
+namespace FormRegister\Services;
 
 class FormRegisterRoleService
 {
-    public function group($group)
+    static public function group($group)
     {
         $group['email_register'] = [
             'label' => 'Form Đăng Ký',
@@ -12,9 +12,22 @@ class FormRegisterRoleService
         return $group;
     }
 
-    public function label( $label ): array
+    static public function label( $label ): array
     {
         return array_merge($label, static::capabilities());
+    }
+
+    /**
+     * Quyền vào từng trang admin của plugin (filter role_editor_admin_route_caps của user-role-editor).
+     */
+    static public function routeCaps($caps): array
+    {
+        $caps['admin.formRegister.index']        = 'generate_form_register';
+        $caps['admin.formRegister.add']          = 'generate_form_register';
+        $caps['admin.formRegister.edit']         = 'generate_form_register';
+        $caps['admin.formRegister.sample']       = 'generate_form_register';
+        $caps['admin.form_register_result.index'] = 'view_email_register';
+        return $caps;
     }
 
     static public function capabilities()
