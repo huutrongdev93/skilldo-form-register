@@ -4,7 +4,7 @@
     "url":"https://sikido.vn",
     "description":"Trình xây dựng form đăng ký",
     "author":"Nguyễn Hữu Trọng",
-    "version":"5.0.4",
+    "version":"5.0.5",
     "autoload": {
         "alias": "FormRegister",
         "psr-4": {

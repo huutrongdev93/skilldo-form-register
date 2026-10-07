@@ -167,11 +167,32 @@ class FormRegisterAjax
 
             $mailsData = apply_filters('generate_form_register_'.$form_key.'_email_data', $mailsData, $form);
 
-            Mail::to(Option::get('contact_mail'))
-                ->subject($subject)
-                ->replyTo(Option::get('contact_mail'), $name)
-                ->body($content, $mailsData)
-                ->send();
+            /*
+            | Người nhận: ô "Email nhận thông báo" của form (nhiều địa chỉ), trống thì email liên hệ.
+            | Trả lời thư thì về thẳng người gửi form nếu họ có nhập email.
+            | Gửi lỗi (chưa cấu hình SMTP, máy chủ mail từ chối) KHÔNG được làm hỏng lượt đăng ký —
+            | dữ liệu đã lưu ở trên, chỉ ghi log.
+            */
+            $recipients = \FormRegister\Models\FormRegister::notifyEmails((int) $form->id);
+
+            if(hasItems($recipients))
+            {
+                try
+                {
+                    $mail = Mail::to(array_shift($recipients))
+                        ->subject($subject)
+                        ->replyTo(filter_var($data['email'] ?? '', FILTER_VALIDATE_EMAIL) ?: Option::get('contact_mail'), $name)
+                        ->body($content, $mailsData);
+
+                    foreach ($recipients as $cc) $mail->cc($cc);
+
+                    $mail->send();
+                }
+                catch (\Throwable $e)
+                {
+                    \Log::error('generate-form-register: gửi email form '.$form->key.' lỗi: '.$e->getMessage());
+                }
+            }
         }
 
         if($form->send_telegram == 1 && Plugin::isActive('telegram'))

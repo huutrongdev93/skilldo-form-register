@@ -63,6 +63,16 @@
                             </div>
                         </div>
 
+                        <div class="row" style="margin-bottom:10px;">
+                            <div class="col-md-3">
+                                <label for="">Email nhận thông báo</label>
+                                <p style="font-size:13px; color:#999;">Nhiều email cách nhau bằng dấu phẩy. Để trống = gửi về email liên hệ (Cấu hình &gt; Liên hệ)</p>
+                            </div>
+                            <div class="col-md-9">
+                                {!! \SkillDo\Cms\Form\Form::text('email_to', ['start' => '<div>', 'end' => '</div>', 'placeholder' => 'vd: sale@domain.vn, admin@domain.vn'], (isset($form)) ? (string) \FormRegister\Models\FormRegister::getMeta($form->id, 'email_to') : '')->render() !!}
+                            </div>
+                        </div>
+
                         @if(\Plugin::isActive('telegram'))
                         <div class="row" style="margin-bottom:10px;">
                             <div class="col-md-3">

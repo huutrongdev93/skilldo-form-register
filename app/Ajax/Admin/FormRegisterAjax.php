@@ -68,6 +68,11 @@ class FormRegisterAjax
 
         $data['field'] = $field;
 
+        // email nhận thông báo: lưu metadata của form (không phải cột) — xem FormRegister::notifyEmails()
+        $emailTo = $request->has('email_to') ? \FormRegister\Models\FormRegister::normalizeEmails((string) $data['email_to']) : null;
+
+        unset($data['email_to']);
+
         //Thêm mới
         if(empty($id))
         {
@@ -86,6 +91,8 @@ class FormRegisterAjax
             {
                 response()->error($error);
             }
+
+            if($emailTo !== null) \FormRegister\Models\FormRegister::updateMeta($error, 'email_to', $emailTo);
 
             FormRegisterHelper::build();
 
@@ -122,6 +129,8 @@ class FormRegisterAjax
             if(!$request->has('is_redirect')) $form->is_redirect = 0;
 
             $form->save();
+
+            if($emailTo !== null) \FormRegister\Models\FormRegister::updateMeta($form->id, 'email_to', $emailTo);
 
             FormRegisterHelper::build();
 

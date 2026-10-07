@@ -6,7 +6,7 @@ file nào trong plugin.
 Nơi **mọi form của site** đổ dữ liệu về. Không tự dựng bảng lưu form mới — kiểm plugin này trước.
 
 - Class chính `GenerateFormRegister` (`index.php`), namespace `FormRegister\*`, alias `FormRegister`.
-- Version 5.0.3.
+- Version 5.0.5.
 
 ## Bảng dữ liệu
 
@@ -89,6 +89,18 @@ sinh lại, nên nó cũng là cách dọn build sót của dự án cũ.
    bản ghi mới.
    ⚠ `Metadata::delete()` chặn bằng `is_numeric($object_id)`: truyền **mảng** là lặng lẽ trả `false`,
    phải lặp từng id.
+
+## Email thông báo khi có bài gửi (5.0.5)
+
+- Bật bằng ô **"Gửi email"** của form (cột `send_email`); nội dung là ô `email_template` — biến `{{tên-input}}`
+  thay bằng giá trị ô nhập cùng `name` ngoài trang (vd `{{fullname}}`, `{{phone}}`, `{{address}}`).
+- Người nhận: ô **"Email nhận thông báo"** ở màn sửa form — lưu là **metadata** của form
+  (`FormRegister::updateMeta($id, 'email_to', …)`, không phải cột), nhiều địa chỉ cách nhau dấu phẩy.
+  Trống thì gửi về `contact_mail` như cũ. Đọc qua `FormRegister::notifyEmails($id)`; địa chỉ đầu là `to`,
+  các địa chỉ sau là `cc`. `replyTo` = email người gửi form nếu họ có nhập, không thì `contact_mail`.
+- Gửi lỗi (chưa cấu hình SMTP — `Mail::send()` ném exception "user smtp đang trống") **không** làm hỏng lượt
+  đăng ký: bài gửi đã lưu, lỗi ghi vào `storage/logs/app-*.log` (`generate-form-register: gửi email form …`).
+  Trước 5.0.5 exception lọt ra ngoài → khách thấy lỗi dù dữ liệu đã lưu.
 
 ## Bẫy khác
 
