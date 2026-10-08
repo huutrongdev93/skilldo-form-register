@@ -83,7 +83,8 @@ class FormRegisterAjax
 
             if(!isset($data['key'])) $data['key'] = $key;
 
-            if(!isset($data['is_live'])) $data['is_live'] = 1;
+            // Ô checkbox bỏ dấu thì trình duyệt không gửi lên: coi là Tắt, không mặc định Bật
+            $data['is_live'] = $request->has('is_live') ? 1 : 0;
 
             $error = \FormRegister\Models\FormRegister::create($data);
 
@@ -413,11 +414,11 @@ class FormRegisterAjax
 
         $writer = new Xlsx($spreadsheet);
 
-        $filePathData = Path::storage('cms/export/');
+        $filePathData = Path::storage('uploads/export/');
 
         if(!file_exists($filePathData))
         {
-            mkdir($filePathData, 0755);
+            mkdir($filePathData, 0755, true);
             chmod($filePathData, 0755);
         }
 
@@ -425,7 +426,8 @@ class FormRegisterAjax
 
         $writer->save($filePathData.$filename);
 
-        $path = Url::base().$filePathData.$filename;
+        // storage/uploads/ là thư mục duy nhất của storage mở ra web (rewrite uploads/ -> storage/uploads/)
+        $path = Url::base().'uploads/export/'.$filename;
 
         response()->success(trans('ajax.load.success'), $path);
     }

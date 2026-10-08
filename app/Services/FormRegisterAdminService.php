@@ -58,5 +58,10 @@ class FormRegisterAdminService
             ['label' => 'Form Đăng ký', 'url' => route('admin.formRegister.index')],
             ['label' => 'Thêm nhanh']
         ]);
+
+        app('breadcrumb.admin')->add('admin.form_register_result.index', [
+            ['label' => trans('admin::navigation.system'), 'url' => route('admin.system.index')],
+            ['label' => 'Kết quả đăng ký']
+        ]);
     }
 }

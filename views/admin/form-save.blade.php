@@ -46,7 +46,7 @@
                             </div>
                             <div class="col-md-9">
                                 <div class="form-check">
-                                    <input type="checkbox" name="is_live" id="is_live" class="form-check-input" value="1" {!! (isset($form) && $form->is_live == 1) ? 'checked' : '' !!}>
+                                    <input type="checkbox" name="is_live" id="is_live" class="form-check-input" value="1" {!! (!isset($form) || $form->is_live == 1) ? 'checked' : '' !!}>
                                 </div>
                             </div>
                         </div>
