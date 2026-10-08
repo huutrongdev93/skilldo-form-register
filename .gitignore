@@ -1,0 +1,4 @@
+# Code sinh ra theo form của TỪNG site bởi FormRegisterHelper::build(). Không commit:
+# gói cập nhật mang theo sẽ ghi đè bản của site và làm sập admin (lỗi 5.0.8).
+/bootstrap/build.php
+/app/Builds/*.php

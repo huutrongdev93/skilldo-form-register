@@ -6,7 +6,7 @@ file nào trong plugin.
 Nơi **mọi form của site** đổ dữ liệu về. Không tự dựng bảng lưu form mới — kiểm plugin này trước.
 
 - Class chính `GenerateFormRegister` (`index.php`), namespace `FormRegister\*`, alias `FormRegister`.
-- Version 5.0.7. 5.0.6: sửa `FormRegisterRoleService` sai namespace (làm sập /admin/system/role). 5.0.7: menu Marketing chỉ hiện khi có `view_email_register`; trang admin chặn theo quyền qua filter `role_editor_admin_route_caps` của user-role-editor; `build()` dùng khoá form GỐC (`tu-van-setup`) thay vì đổi `-` → `_` — trước đó link menu kết quả trỏ `form-key=tu_van_setup` nên trang kết quả 404 với mọi tài khoản và số đếm luôn 0.
+- Version 5.0.9. 5.0.9: bỏ `bootstrap/build.php` khỏi git (xem mục `build()` bên dưới). 5.0.6: sửa `FormRegisterRoleService` sai namespace (làm sập /admin/system/role). 5.0.7: menu Marketing chỉ hiện khi có `view_email_register`; trang admin chặn theo quyền qua filter `role_editor_admin_route_caps` của user-role-editor; `build()` dùng khoá form GỐC (`tu-van-setup`) thay vì đổi `-` → `_` — trước đó link menu kết quả trỏ `form-key=tu_van_setup` nên trang kết quả 404 với mọi tài khoản và số đếm luôn 0.
 
 ## Bảng dữ liệu
 
@@ -67,6 +67,12 @@ hình nào trong admin để xem** — nhìn y hệt "form không lưu được"
 
 Rồi `ls app/Builds/` xác nhận đúng các form của dự án hiện tại. `build()` xoá sạch thư mục trước khi
 sinh lại, nên nó cũng là cách dọn build sót của dự án cũ.
+
+⛔ **Hai file sinh ra này KHÔNG được vào git và KHÔNG được vào gói cập nhật** (`.gitignore` đã chặn).
+Gói 5.0.8 lỡ mang `bootstrap/build.php` của máy dev (hook trỏ tới `TuVanMauBuild`, class không có trên
+site khách). Cập nhật xong, file đó ghi đè bản của site, hook `admin_navigation` gọi class không tồn tại
+và **toàn bộ admin trả 500**, kể cả ajax, nên không tự cập nhật thoát ra được. Gặp lại lỗi này thì sửa
+trên server: ghi đè `bootstrap/build.php` thành `<?php`, vào admin lưu lại một form để `build()` sinh lại.
 
 ## Bảng kết quả trong admin — ba ràng buộc dễ làm hỏng khi sửa
 
